@@ -67,22 +67,16 @@ export default function MVPLockdownPage() {
   const [editDesc, setEditDesc] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // Load features from Supabase
+  // Load features from Supabase and poll for updates
   useEffect(() => {
     loadFeatures()
     
-    // Subscribe to real-time updates
-    const subscription = supabase
-      .from('features')
-      .on('*', payload => {
-        console.log('Real-time update:', payload)
-        loadFeatures() // Reload on any change
-      })
-      .subscribe()
+    // Poll for changes every 2 seconds for real-time feel
+    const interval = setInterval(() => {
+      loadFeatures()
+    }, 2000)
     
-    return () => {
-      subscription.unsubscribe()
-    }
+    return () => clearInterval(interval)
   }, [])
 
   // Load saved credentials
