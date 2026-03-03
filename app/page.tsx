@@ -345,7 +345,7 @@ export default function MVPLockdownPage() {
                   type="text"
                   value={username}
                   onChange={e => setUsername(e.target.value)}
-                  placeholder="e.g., pedro"
+                  placeholder="Enter username"
                   className="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20"
                   onKeyPress={e => e.key === 'Enter' && handleLogin()}
                 />
