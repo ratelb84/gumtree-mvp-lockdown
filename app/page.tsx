@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 
 type Person = 'pedro' | 'betine' | 'damian' | 'don'
-type Column = 'mvp' | 'v1.1' | 'v2'
+type Column = 'mvp' | 'v1.1' | 'v2' | 'backburner'
 type Stage = 'login' | 'board'
 
 interface Feature {
@@ -39,12 +39,14 @@ const columnLabels: Record<Column, string> = {
   mvp: '🔴 MVP',
   'v1.1': '🟡 V1.1 Post Launch',
   'v2': '🟢 V2 Future',
+  'backburner': '⚫ Backburner',
 }
 
 const columnColors: Record<Column, string> = {
   mvp: 'border-red-500/30 bg-red-500/5',
   'v1.1': 'border-yellow-500/30 bg-yellow-500/5',
   'v2': 'border-green-500/30 bg-green-500/5',
+  'backburner': 'border-gray-500/30 bg-gray-500/5',
 }
 
 export default function MVPLockdownPage() {
@@ -144,7 +146,7 @@ export default function MVPLockdownPage() {
               </div>
               <h1 className="text-3xl font-bold text-white mb-1">GUMTREE</h1>
               <p className="text-lg font-semibold text-green-400 mb-3">MVP Board</p>
-              <p className="text-gray-400 text-sm">Collaborative feature planning</p>
+              <p className="text-gray-400 text-sm">Collaborative feature planning · 4 phases</p>
             </div>
 
             <div className="space-y-4">
@@ -213,7 +215,7 @@ export default function MVPLockdownPage() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-white">GUMTREE MVP Board</h1>
-                <p className="text-xs text-gray-400">Real-time feature planning · 3 release phases</p>
+                <p className="text-xs text-gray-400">Real-time feature planning · 4 planning phases</p>
               </div>
             </div>
             <div className="flex gap-3 items-center ml-auto">
@@ -262,8 +264,8 @@ export default function MVPLockdownPage() {
             </div>
           </div>
 
-          {/* Kanban Board - 3 Release Columns */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Kanban Board - 4 Columns */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {(Object.keys(columnLabels) as Column[]).map(column => (
               <div key={column} className={`border rounded-xl overflow-hidden ${columnColors[column]}`}>
                 {/* Column Header */}
