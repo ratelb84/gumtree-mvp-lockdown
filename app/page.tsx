@@ -273,16 +273,6 @@ export default function MVPLockdownPage() {
                 Sign In
               </button>
             </div>
-
-            <div className="mt-8 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs text-amber-300">
-              <strong className="block mb-2">Demo Credentials:</strong>
-              <div className="space-y-1 font-mono text-xs">
-                <div>Pedro: pedro / Pedro123!</div>
-                <div>Betine: betine / Betine123!</div>
-                <div>Damian: damian / Damian123!</div>
-                <div>Don: don / Don123!</div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
