@@ -87,15 +87,4 @@ export async function updateFeature(id: string, updates: Partial<Feature>) {
   return data?.[0] as Feature
 }
 
-// Subscribe to real-time changes
-export function subscribeToFeatures(callback: (feature: Feature) => void) {
-  const subscription = supabase
-    .from('features')
-    .on('*', payload => {
-      console.log('Feature change:', payload)
-      callback(payload.new as Feature)
-    })
-    .subscribe()
-  
-  return subscription
-}
+
