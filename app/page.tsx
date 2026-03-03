@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 type Person = 'pedro' | 'betine' | 'damian' | 'don'
 type Column = 'mvp' | 'v1.1' | 'v2' | 'backburner'
 type Stage = 'login' | 'board'
-type Category = 'listings' | 'search' | 'auth' | 'checkout' | 'delivery' | 'messaging' | 'seller-tools' | 'buyer-protection' | 'infrastructure' | 'other'
+type Category = 'listings' | 'search' | 'auth' | 'checkout' | 'delivery' | 'messaging' | 'seller-tools' | 'buyer-protection' | 'infrastructure' | 'subscription' | 'advertising' | 'other'
 
 interface Feature {
   id: string
@@ -54,6 +54,8 @@ const categoryLabels: Record<Category, string> = {
   'seller-tools': '💰 Seller Tools',
   'buyer-protection': '🛡️ Buyer Protection',
   infrastructure: '🏗️ Infrastructure',
+  subscription: '💳 Subscription Revenue',
+  advertising: '📢 Advertising',
   other: '📌 Other',
 }
 
