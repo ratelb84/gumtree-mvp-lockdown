@@ -73,6 +73,7 @@ export default function MVPLockdownPage() {
   const [loginError, setLoginError] = useState('')
   const [input, setInput] = useState('')
   const [selectedColumn, setSelectedColumn] = useState<Column>('mvp')
+  const [selectedCategory, setSelectedCategory] = useState<Category>('listings')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editTitle, setEditTitle] = useState('')
   const [editDesc, setEditDesc] = useState('')
@@ -243,6 +244,7 @@ export default function MVPLockdownPage() {
       id: Math.random().toString(36).substr(2, 9),
       title: input.split('\n')[0],
       description: input.includes('\n') ? input.split('\n').slice(1).join('\n') : '',
+      category: selectedCategory,
       person: currentPerson,
       column: selectedColumn,
       timestamp: Date.now(),
@@ -383,7 +385,7 @@ export default function MVPLockdownPage() {
         <main className="max-w-full px-4 py-6">
           {/* Add Feature Input - Compact */}
           <div className="mb-6 bg-white/5 border border-white/10 rounded-lg p-4">
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <input
                 type="text"
                 value={input}
@@ -392,6 +394,15 @@ export default function MVPLockdownPage() {
                 placeholder="Add new feature..."
                 className="flex-1 bg-black/40 border border-white/10 rounded px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white/30"
               />
+              <select
+                value={selectedCategory}
+                onChange={e => setSelectedCategory(e.target.value as Category)}
+                className="bg-black/40 border border-white/10 rounded px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-white/30"
+              >
+                {(Object.keys(categoryLabels) as Category[]).map(cat => (
+                  <option key={cat} value={cat}>{categoryLabels[cat]}</option>
+                ))}
+              </select>
               <select
                 value={selectedColumn}
                 onChange={e => setSelectedColumn(e.target.value as Column)}
