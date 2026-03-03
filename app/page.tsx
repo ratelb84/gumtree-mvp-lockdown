@@ -303,18 +303,9 @@ export default function MVPLockdownPage() {
   }
 
   const getFeaturesInColumn = (column: Column) => {
-    const result = features.filter(f => f.column === column)
-    // Debug log
-    if (typeof window !== 'undefined') {
-      console.log(`Features in ${column}:`, result.length)
-    }
-    return result
+    return features.filter(f => f.column === column)
   }
 
-  const getPersonFeatures = (person: Person) => {
-    return features.filter(f => f.person === person)
-  }
-  
   // Debug: Log total features
   useEffect(() => {
     if (typeof window !== 'undefined') {
