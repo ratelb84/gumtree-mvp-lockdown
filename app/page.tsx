@@ -73,7 +73,6 @@ export default function MVPLockdownPage() {
   const [loginError, setLoginError] = useState('')
   const [input, setInput] = useState('')
   const [selectedColumn, setSelectedColumn] = useState<Column>('mvp')
-  const [selectedCategory, setSelectedCategory] = useState<Category>('listings')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editTitle, setEditTitle] = useState('')
   const [editDesc, setEditDesc] = useState('')
