@@ -64,23 +64,8 @@ const columnColors: Record<Column, string> = {
   'backburner': 'border-gray-500/30 bg-gray-500/5',
 }
 
-export default function MVPLockdownPage() {
-  const [stage, setStage] = useState<Stage>('login')
-  const [currentPerson, setCurrentPerson] = useState<Person | null>(null)
-  const [features, setFeatures] = useState<Feature[]>([])
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [loginError, setLoginError] = useState('')
-  const [rememberMe, setRememberMe] = useState(false)
-  const [input, setInput] = useState('')
-  const [selectedColumn, setSelectedColumn] = useState<Column>('mvp')
-  const [selectedCategory, setSelectedCategory] = useState<Category>('listings')
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editTitle, setEditTitle] = useState('')
-  const [editDesc, setEditDesc] = useState('')
-
-  // Default MVP features (Based on research & scope)
-  const DEFAULT_FEATURES: Feature[] = [
+// Default MVP features (Based on research & scope)
+const DEFAULT_FEATURES: Feature[] = [
     // CORE LISTINGS & BROWSING
     { id: 'mvp-1', title: 'Post Listing with Photos', description: 'Title, description, price, category, location, up to 6 photos, condition selector', category: 'listings', person: 'don', column: 'mvp', timestamp: Date.now() - 3600000 },
     { id: 'mvp-2', title: 'Edit/Delete/Pause Listings', description: 'Owner can modify or remove listings anytime', category: 'listings', person: 'don', column: 'mvp', timestamp: Date.now() - 3600000 },
@@ -193,7 +178,22 @@ export default function MVPLockdownPage() {
     // INFRASTRUCTURE
     { id: 'v2-20', title: 'Regional Expansion (SADC)', description: 'Multi-country support, local payment methods, regional logistics', category: 'infrastructure', person: 'don', column: 'v2', timestamp: Date.now() - 3600000 },
     { id: 'v2-21', title: 'Multi-Language Support', description: 'Localization for South African languages, Swahili, Portuguese support', category: 'infrastructure', person: 'don', column: 'v2', timestamp: Date.now() - 3600000 },
-  ]
+]
+
+export default function MVPLockdownPage() {
+  const [stage, setStage] = useState<Stage>('login')
+  const [currentPerson, setCurrentPerson] = useState<Person | null>(null)
+  const [features, setFeatures] = useState<Feature[]>(DEFAULT_FEATURES)
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [loginError, setLoginError] = useState('')
+  const [rememberMe, setRememberMe] = useState(false)
+  const [input, setInput] = useState('')
+  const [selectedColumn, setSelectedColumn] = useState<Column>('mvp')
+  const [selectedCategory, setSelectedCategory] = useState<Category>('listings')
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [editDesc, setEditDesc] = useState('')
 
   // Load from localStorage
   useEffect(() => {
