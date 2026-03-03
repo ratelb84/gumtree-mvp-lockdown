@@ -220,10 +220,10 @@ export default function MVPLockdownPage() {
     }
   }, [])
 
-  // Save to localStorage (only save if we have all features)
+  // Save to localStorage - always save any changes
   useEffect(() => {
-    // Only save if we have a significant number of features (prevent saving corrupted data)
-    if (features && features.length >= 34) {
+    // Save all features including new items added by users
+    if (features && features.length > 0) {
       localStorage.setItem('gumtree_mvp_features', JSON.stringify({ features }))
     }
   }, [features])
