@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase, type Feature, getFeatures, addFeature, deleteFeature, updateFeature } from './supabase'
+import { type Feature, getFeatures, addFeature, deleteFeature, updateFeature } from './supabase'
 
 type Person = 'pedro' | 'betine' | 'damian' | 'don'
 type Column = 'mvp' | 'v1.1' | 'v2' | 'backburner'
