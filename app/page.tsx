@@ -538,20 +538,24 @@ export default function MVPLockdownPage() {
                                     {new Date(feature.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                   </div>
 
-                                  {/* Move Buttons */}
-                                  <div className="flex gap-0.5 flex-wrap">
-                                    {(Object.keys(columnLabels) as Column[]).map(col => 
-                                      col !== column && (
+                                  {/* Move Buttons - Colored Labels */}
+                                  <div className="flex gap-1 flex-wrap mt-2">
+                                    {(Object.keys(columnLabels) as Column[]).map(col => {
+                                      const colLabel = col === 'mvp' ? 'MVP' : col === 'v1.1' ? 'V1.1' : col === 'v2' ? 'V2' : 'Backburner'
+                                      const bgColor = col === 'mvp' ? 'bg-red-500/60' : col === 'v1.1' ? 'bg-yellow-500/60' : col === 'v2' ? 'bg-green-500/60' : 'bg-gray-500/60'
+                                      const textColor = 'text-white text-xs'
+                                      
+                                      return col !== column && (
                                         <button
                                           key={col}
                                           onClick={() => handleMoveFeature(feature.id, col)}
                                           title={columnLabels[col]}
-                                          className="text-xs px-1.5 py-0.5 bg-white/10 hover:bg-white/20 text-gray-300 rounded transition"
+                                          className={`${bgColor} ${textColor} px-2 py-1 rounded-full font-semibold hover:opacity-80 transition`}
                                         >
-                                          {columnLabels[col].split(' ')[0]}
+                                          {colLabel}
                                         </button>
                                       )
-                                    )}
+                                    })}
                                   </div>
 
                                   {/* Edit & Delete Buttons */}
