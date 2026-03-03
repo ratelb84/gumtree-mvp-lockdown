@@ -227,8 +227,8 @@ export default function MVPLockdownPage() {
         <div className="max-w-md w-full">
           <div className="bg-black/50 border border-white/10 rounded-2xl p-8 backdrop-blur">
             <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-green-700 mb-4">
-                <span className="text-3xl">🌳</span>
+              <div className="inline-flex items-center justify-center w-20 h-20 mb-4">
+                <img src="/gumtree-logo.jpg" alt="Gumtree" className="w-full h-full object-contain" />
               </div>
               <h1 className="text-3xl font-bold text-white mb-1">GUMTREE</h1>
               <p className="text-lg font-semibold text-green-400 mb-3">MVP Board</p>
@@ -296,8 +296,8 @@ export default function MVPLockdownPage() {
         <header className="sticky top-0 z-40 border-b border-white/10 bg-black/30 backdrop-blur">
           <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
             <div className="flex items-center gap-4">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-green-500 to-green-700">
-                <span className="text-2xl">🌳</span>
+              <div className="w-12 h-12 flex-shrink-0">
+                <img src="/gumtree-logo.jpg" alt="Gumtree" className="w-full h-full object-contain" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-white">GUMTREE MVP Board</h1>
