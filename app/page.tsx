@@ -469,7 +469,15 @@ export default function MVPLockdownPage() {
               <div key={column} className={`border rounded-lg overflow-hidden flex flex-col ${columnColors[column]}`}>
                 {/* Column Header - Compact */}
                 <div className="px-4 py-3 border-b border-white/10 bg-black/40 flex-shrink-0">
-                  <h2 className="text-base font-bold text-white">{columnLabels[column]}</h2>
+                  <div className="flex items-center gap-2 mb-2">
+                    {column === 'mvp' && <span className="text-lg">🔴</span>}
+                    {column === 'v1.1' && <span className="text-lg">🟡</span>}
+                    {column === 'v2' && <span className="text-lg">🟢</span>}
+                    {column === 'backburner' && <span className="text-lg">⚫</span>}
+                    <span className="text-sm font-bold px-3 py-1 rounded-md bg-white/10 text-white">
+                      {column === 'mvp' ? 'MVP' : column === 'v1.1' ? 'V1.1' : column === 'v2' ? 'V2' : 'Backburner'}
+                    </span>
+                  </div>
                   <p className="text-xs text-gray-400">{getFeaturesInColumn(column).length} items</p>
                 </div>
 
