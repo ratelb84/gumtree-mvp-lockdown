@@ -338,4 +338,6 @@ export default function MVPLockdownPage() {
       </div>
     )
   }
+
+  return null
 }
