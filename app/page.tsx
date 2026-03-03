@@ -59,16 +59,102 @@ export default function MVPLockdownPage() {
   const [input, setInput] = useState('')
   const [selectedColumn, setSelectedColumn] = useState<Column>('mvp')
 
+  // Default MVP features (B2C Scope + Account Management)
+  const DEFAULT_FEATURES: Feature[] = [
+    {
+      id: 'mvp-1',
+      title: 'User Registration & Authentication',
+      description: 'Email signup, login, password reset, OAuth support',
+      person: 'don',
+      column: 'mvp',
+      timestamp: Date.now() - 3600000,
+    },
+    {
+      id: 'mvp-2',
+      title: 'Seller Profile Management',
+      description: 'Profile creation, business info, bank details, payout settings',
+      person: 'don',
+      column: 'mvp',
+      timestamp: Date.now() - 3600000,
+    },
+    {
+      id: 'mvp-3',
+      title: 'Buyer Account Dashboard',
+      description: 'Order history, saved items, purchases, account settings',
+      person: 'don',
+      column: 'mvp',
+      timestamp: Date.now() - 3600000,
+    },
+    {
+      id: 'mvp-4',
+      title: 'Product Listing Management',
+      description: 'Create, edit, delete listings with photos, categories, pricing',
+      person: 'don',
+      column: 'mvp',
+      timestamp: Date.now() - 3600000,
+    },
+    {
+      id: 'mvp-5',
+      title: 'Search & Discovery',
+      description: 'Full-text search, filters (category, price, location), sorting',
+      person: 'don',
+      column: 'mvp',
+      timestamp: Date.now() - 3600000,
+    },
+    {
+      id: 'mvp-6',
+      title: 'Secure Checkout & Payment',
+      description: 'Card payments, escrow system, payment confirmation',
+      person: 'don',
+      column: 'mvp',
+      timestamp: Date.now() - 3600000,
+    },
+    {
+      id: 'mvp-7',
+      title: 'Order Tracking & Delivery',
+      description: 'Courier integration, tracking links, delivery confirmation',
+      person: 'don',
+      column: 'mvp',
+      timestamp: Date.now() - 3600000,
+    },
+    {
+      id: 'mvp-8',
+      title: 'Seller Wallet & Payouts',
+      description: 'Earnings tracking, EFT payouts, transaction history',
+      person: 'don',
+      column: 'mvp',
+      timestamp: Date.now() - 3600000,
+    },
+    {
+      id: 'mvp-9',
+      title: 'Messaging System',
+      description: 'Buyer-seller in-app messaging for pre-purchase questions',
+      person: 'don',
+      column: 'mvp',
+      timestamp: Date.now() - 3600000,
+    },
+    {
+      id: 'mvp-10',
+      title: 'Buyer Protection & Disputes',
+      description: 'Dispute resolution, refunds, item protection policy',
+      person: 'don',
+      column: 'mvp',
+      timestamp: Date.now() - 3600000,
+    },
+  ]
+
   // Load from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('gumtree_mvp_features')
     if (saved) {
       try {
         const data = JSON.parse(saved)
-        setFeatures(data.features || [])
+        setFeatures(data.features || DEFAULT_FEATURES)
       } catch (e) {
-        // Ignore parse errors
+        setFeatures(DEFAULT_FEATURES)
       }
+    } else {
+      setFeatures(DEFAULT_FEATURES)
     }
   }, [])
 
