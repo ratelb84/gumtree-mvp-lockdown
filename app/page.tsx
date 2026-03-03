@@ -184,19 +184,12 @@ export default function MVPLockdownPage() {
   const [stage, setStage] = useState<Stage>('login')
   const [currentPerson, setCurrentPerson] = useState<Person | null>(null)
   const [features, setFeatures] = useState<Feature[]>(() => {
-    // Try to load from localStorage first
-    try {
-      const saved = localStorage.getItem('gumtree_mvp_features')
-      if (saved) {
-        const data = JSON.parse(saved)
-        if (data.features && Array.isArray(data.features) && data.features.length > 0) {
-          return data.features
-        }
-      }
-    } catch (e) {
-      // Ignore errors
+    // Always use DEFAULT_FEATURES on initial load
+    // localStorage can have corrupted data, so we'll ignore it
+    if (typeof window !== 'undefined') {
+      // Clear any corrupted localStorage data
+      localStorage.removeItem('gumtree_mvp_features')
     }
-    // Fall back to DEFAULT_FEATURES
     return [...DEFAULT_FEATURES]
   })
   const [username, setUsername] = useState('')
@@ -225,9 +218,10 @@ export default function MVPLockdownPage() {
     }
   }, [])
 
-  // Save to localStorage (only save if we have features)
+  // Save to localStorage (only save if we have all features)
   useEffect(() => {
-    if (features && features.length > 0) {
+    // Only save if we have a significant number of features (prevent saving corrupted data)
+    if (features && features.length >= 34) {
       localStorage.setItem('gumtree_mvp_features', JSON.stringify({ features }))
     }
   }, [features])
