@@ -39,8 +39,8 @@ const personColors: Record<Person, { bg: string; text: string; border: string; l
 
 const columnLabels: Record<Column, string> = {
   mvp: '🔴 MVP',
-  'v1.1': '🟡 V1.1 Post Launch',
-  'v2': '🟢 V2 Future',
+  'v1.1': '🟡 V1.1 - Post MVP Launch',
+  'v2': '🟢 V2 - Post V1.1 Launch',
   'backburner': '⚫ Backburner',
 }
 
