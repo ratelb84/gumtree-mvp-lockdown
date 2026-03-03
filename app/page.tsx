@@ -293,24 +293,24 @@ export default function MVPLockdownPage() {
   if (stage === 'board') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <header className="sticky top-0 z-40 border-b border-white/10 bg-black/30 backdrop-blur">
-          <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 flex-shrink-0">
+        <header className="sticky top-0 z-40 border-b border-white/10 bg-black/40 backdrop-blur">
+          <div className="max-w-full mx-auto px-4 py-3 flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 flex-shrink-0">
                 <img src="/gumtree-logo.jpg" alt="Gumtree" className="w-full h-full object-contain" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-white">GUMTREE MVP Board</h1>
-                <p className="text-xs text-gray-400">Real-time feature planning · 4 planning phases</p>
+                <h1 className="text-xl font-bold text-white">GUMTREE MVP</h1>
+                <p className="text-xs text-gray-500">MVP • V1.1 • V2 • Backburner</p>
               </div>
             </div>
-            <div className="flex gap-3 items-center ml-auto">
-              <div className={`px-4 py-2 rounded-lg font-semibold ${personColors[currentPerson!].bg} ${personColors[currentPerson!].text}`}>
+            <div className="flex gap-2 items-center ml-auto">
+              <div className={`px-3 py-1.5 rounded text-sm font-semibold ${personColors[currentPerson!].bg} ${personColors[currentPerson!].text}`}>
                 {USERS[currentPerson!].name}
               </div>
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition text-sm"
+                className="px-3 py-1.5 bg-gray-700 text-white rounded text-sm hover:bg-gray-600 transition"
               >
                 Logout
               </button>
@@ -318,88 +318,92 @@ export default function MVPLockdownPage() {
           </div>
         </header>
 
-        <main className="max-w-7xl mx-auto px-6 py-8">
-          {/* Add Feature Input */}
-          <div className="mb-8 bg-white/5 border border-white/10 rounded-xl p-6">
-            <label className="block text-sm font-semibold text-gray-300 mb-3">Add new feature:</label>
-            <div className="space-y-3">
-              <textarea
+        <main className="max-w-full px-4 py-6">
+          {/* Add Feature Input - Compact */}
+          <div className="mb-6 bg-white/5 border border-white/10 rounded-lg p-4">
+            <div className="flex gap-2">
+              <input
+                type="text"
                 value={input}
                 onChange={e => setInput(e.target.value)}
-                placeholder="Feature title&#10;Optional: Add description (one per line)"
-                rows={3}
-                className="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20 resize-none"
+                onKeyPress={e => e.key === 'Enter' && handleAddFeature()}
+                placeholder="Add new feature..."
+                className="flex-1 bg-black/40 border border-white/10 rounded px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white/30"
               />
-              <div className="flex gap-2">
-                <select
-                  value={selectedColumn}
-                  onChange={e => setSelectedColumn(e.target.value as Column)}
-                  className="bg-black/30 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-white/20"
-                >
-                  {(Object.keys(columnLabels) as Column[]).map(col => (
-                    <option key={col} value={col}>{columnLabels[col]}</option>
-                  ))}
-                </select>
-                <button
-                  onClick={handleAddFeature}
-                  className={`px-6 py-2 rounded-lg font-semibold ${personColors[currentPerson!].bg} ${personColors[currentPerson!].text} hover:opacity-90 transition`}
-                >
-                  ➕ Add Feature
-                </button>
-              </div>
+              <select
+                value={selectedColumn}
+                onChange={e => setSelectedColumn(e.target.value as Column)}
+                className="bg-black/40 border border-white/10 rounded px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-white/30"
+              >
+                {(Object.keys(columnLabels) as Column[]).map(col => (
+                  <option key={col} value={col}>{columnLabels[col]}</option>
+                ))}
+              </select>
+              <button
+                onClick={handleAddFeature}
+                className={`px-4 py-2 rounded font-semibold text-sm ${personColors[currentPerson!].bg} ${personColors[currentPerson!].text} hover:opacity-90 transition`}
+              >
+                Add
+              </button>
             </div>
           </div>
 
-          {/* Kanban Board - 4 Columns */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Kanban Board - 4 Columns - Compact */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {(Object.keys(columnLabels) as Column[]).map(column => (
-              <div key={column} className={`border rounded-xl overflow-hidden ${columnColors[column]}`}>
-                {/* Column Header */}
-                <div className="px-6 py-4 border-b border-white/10 bg-black/30">
-                  <h2 className="text-lg font-bold text-white">{columnLabels[column]}</h2>
-                  <p className="text-sm text-gray-400">{getFeaturesInColumn(column).length} items</p>
+              <div key={column} className={`border rounded-lg overflow-hidden flex flex-col ${columnColors[column]}`}>
+                {/* Column Header - Compact */}
+                <div className="px-4 py-3 border-b border-white/10 bg-black/40 flex-shrink-0">
+                  <h2 className="text-base font-bold text-white">{columnLabels[column]}</h2>
+                  <p className="text-xs text-gray-400">{getFeaturesInColumn(column).length} items</p>
                 </div>
 
-                {/* Features */}
-                <div className="p-4 space-y-3 min-h-96">
+                {/* Features - Scrollable */}
+                <div className="flex-1 overflow-y-auto p-3 space-y-2 min-h-96">
                   {getFeaturesInColumn(column).map(feature => (
                     <div
                       key={feature.id}
-                      className={`${personColors[feature.person].light} border border-white/10 rounded-lg p-4 group relative hover:bg-white/10 transition`}
+                      className={`${personColors[feature.person].light} border border-white/10 rounded p-2.5 group relative hover:border-white/20 transition text-xs`}
                     >
-                      {/* Person Badge */}
-                      <div className={`inline-block mb-2 px-2 py-1 rounded text-xs font-semibold ${personColors[feature.person].bg} ${personColors[feature.person].text}`}>
+                      {/* Person Badge - Compact */}
+                      <div className={`inline-block mb-1 px-1.5 py-0.5 rounded text-xs font-semibold ${personColors[feature.person].bg} ${personColors[feature.person].text}`}>
                         {USERS[feature.person].name}
                       </div>
 
-                      <h3 className="text-white font-semibold text-sm mb-1">{feature.title}</h3>
+                      {/* Title - Tight */}
+                      <h3 className="text-white font-semibold text-xs leading-tight mb-1">{feature.title}</h3>
+
+                      {/* Description - Optional, collapsed */}
                       {feature.description && (
-                        <p className="text-gray-300 text-xs mb-2">{feature.description}</p>
+                        <p className="text-gray-400 text-xs leading-tight mb-1 line-clamp-2">{feature.description}</p>
                       )}
 
-                      <div className="text-xs text-gray-400 mb-3">
-                        {new Date(feature.timestamp).toLocaleTimeString()}
+                      {/* Time - Minimal */}
+                      <div className="text-xs text-gray-500 mb-1">
+                        {new Date(feature.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </div>
 
-                      {/* Move & Delete Buttons */}
-                      <div className="flex gap-1 flex-wrap">
+                      {/* Move Buttons - Compact */}
+                      <div className="flex gap-0.5 flex-wrap">
                         {(Object.keys(columnLabels) as Column[]).map(col => 
                           col !== column && (
                             <button
                               key={col}
                               onClick={() => handleMoveFeature(feature.id, col)}
-                              className="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 text-gray-300 rounded transition"
+                              title={columnLabels[col]}
+                              className="text-xs px-1.5 py-0.5 bg-white/10 hover:bg-white/20 text-gray-300 rounded transition"
                             >
-                              → {columnLabels[col].split(' ')[1]}
+                              {columnLabels[col].split(' ')[0]}
                             </button>
                           )
                         )}
                       </div>
 
+                      {/* Delete Button */}
                       {currentPerson === feature.person && (
                         <button
                           onClick={() => handleRemoveFeature(feature.id)}
-                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition bg-red-500/80 hover:bg-red-600 text-white rounded px-2 py-1 text-xs"
+                          className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition bg-red-500/80 hover:bg-red-600 text-white rounded px-1 py-0.5 text-xs leading-none"
                         >
                           ✕
                         </button>
@@ -407,26 +411,22 @@ export default function MVPLockdownPage() {
                     </div>
                   ))}
                   {getFeaturesInColumn(column).length === 0 && (
-                    <div className="text-gray-500 text-sm italic py-8 text-center">No features yet...</div>
+                    <div className="text-gray-600 text-xs italic py-4 text-center">No items</div>
                   )}
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Summary by Person */}
-          <div className="mt-12">
-            <h3 className="text-xl font-bold text-white mb-4">📊 Contributions by Person</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Summary by Person - Compact */}
+          <div className="mt-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {(Object.keys(USERS) as Person[]).map(person => (
-                <div key={person} className={`${personColors[person].light} border ${personColors[person].border} rounded-lg p-4`}>
-                  <div className={`text-3xl font-bold ${personColors[person].text} mb-1`}>
+                <div key={person} className={`${personColors[person].light} border ${personColors[person].border} rounded-lg p-3 text-center`}>
+                  <div className={`text-2xl font-bold ${personColors[person].text}`}>
                     {getPersonFeatures(person).length}
                   </div>
-                  <div className="text-sm text-gray-300">{USERS[person].name}</div>
-                  <div className="text-xs text-gray-500 mt-2">
-                    {getPersonFeatures(person).map(f => columnLabels[f.column]).join(', ') || 'No items'}
-                  </div>
+                  <div className="text-xs text-gray-300">{USERS[person].name}</div>
                 </div>
               ))}
             </div>
