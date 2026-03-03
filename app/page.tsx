@@ -598,19 +598,7 @@ export default function MVPLockdownPage() {
             ))}
           </div>
 
-          {/* Summary by Person - Compact */}
-          <div className="mt-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {(Object.keys(USERS) as Person[]).map(person => (
-                <div key={person} className={`${personColors[person].light} border ${personColors[person].border} rounded-lg p-3 text-center`}>
-                  <div className={`text-2xl font-bold ${personColors[person].text}`}>
-                    {getPersonFeatures(person).length}
-                  </div>
-                  <div className="text-xs text-gray-300">{USERS[person].name}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+
         </main>
       </div>
     )
