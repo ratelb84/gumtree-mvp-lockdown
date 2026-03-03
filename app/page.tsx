@@ -390,10 +390,10 @@ export default function MVPLockdownPage() {
                             ) : (
                               // VIEW MODE
                               <div
-                                className={`${personColors[feature.person].light} border border-white/10 rounded p-2.5 group relative hover:border-white/20 transition text-xs`}
+                                className={`${personColors[feature.person as Person].light} border border-white/10 rounded p-2.5 group relative hover:border-white/20 transition text-xs`}
                               >
                                 {/* Person Badge */}
-                                <div className={`inline-block mb-1 px-1.5 py-0.5 rounded text-xs font-semibold ${personColors[feature.person].bg} ${personColors[feature.person].text}`}>
+                                <div className={`inline-block mb-1 px-1.5 py-0.5 rounded text-xs font-semibold ${personColors[feature.person as Person].bg} ${personColors[feature.person as Person].text}`}>
                                   {USERS[feature.person].name}
                                 </div>
 
