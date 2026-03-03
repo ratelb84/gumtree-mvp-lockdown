@@ -139,7 +139,11 @@ export default function MVPLockdownPage() {
         <div className="max-w-md w-full">
           <div className="bg-black/50 border border-white/10 rounded-2xl p-8 backdrop-blur">
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-white mb-2">🎯 Gumtree MVP Board</h1>
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-green-700 mb-4">
+                <span className="text-3xl">🌳</span>
+              </div>
+              <h1 className="text-3xl font-bold text-white mb-1">GUMTREE</h1>
+              <p className="text-lg font-semibold text-green-400 mb-3">MVP Board</p>
               <p className="text-gray-400 text-sm">Collaborative feature planning</p>
             </div>
 
@@ -203,11 +207,16 @@ export default function MVPLockdownPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
         <header className="sticky top-0 z-40 border-b border-white/10 bg-black/30 backdrop-blur">
           <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-white">🎯 Gumtree MVP Kanban Board</h1>
-              <p className="text-sm text-gray-400">Real-time feature planning · 3 release phases</p>
+            <div className="flex items-center gap-4">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-green-500 to-green-700">
+                <span className="text-2xl">🌳</span>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-white">GUMTREE MVP Board</h1>
+                <p className="text-xs text-gray-400">Real-time feature planning · 3 release phases</p>
+              </div>
             </div>
-            <div className="flex gap-3 items-center">
+            <div className="flex gap-3 items-center ml-auto">
               <div className={`px-4 py-2 rounded-lg font-semibold ${personColors[currentPerson!].bg} ${personColors[currentPerson!].text}`}>
                 {USERS[currentPerson!].name}
               </div>
