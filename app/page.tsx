@@ -355,7 +355,7 @@ export default function MVPLockdownPage() {
                           <div key={feature.id}>
                             {editingId === feature.id && currentPerson === feature.person ? (
                               // EDIT MODE
-                              <div className={`${personColors[feature.person].light} border border-white/20 rounded p-2 space-y-1`}>
+                              <div className={`${personColors[feature.person as Person].light} border border-white/20 rounded p-2 space-y-1`}>
                                 <input
                                   type="text"
                                   value={editTitle}
@@ -394,7 +394,7 @@ export default function MVPLockdownPage() {
                               >
                                 {/* Person Badge */}
                                 <div className={`inline-block mb-1 px-1.5 py-0.5 rounded text-xs font-semibold ${personColors[feature.person as Person].bg} ${personColors[feature.person as Person].text}`}>
-                                  {USERS[feature.person].name}
+                                  {USERS[feature.person as Person].name}
                                 </div>
 
                                 {/* Title */}
