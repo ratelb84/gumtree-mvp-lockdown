@@ -197,18 +197,22 @@ export default function MVPLockdownPage() {
 
   // Load from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('gumtree_mvp_features')
-    let loadedFeatures = DEFAULT_FEATURES
+    let loadedFeatures = [...DEFAULT_FEATURES]
     
+    const saved = localStorage.getItem('gumtree_mvp_features')
     if (saved) {
       try {
         const data = JSON.parse(saved)
         // Only use saved data if it has features
-        if (data.features && data.features.length > 0) {
+        if (data.features && Array.isArray(data.features) && data.features.length > 0) {
           loadedFeatures = data.features
+        } else {
+          // Clear bad cache and use defaults
+          localStorage.removeItem('gumtree_mvp_features')
         }
       } catch (e) {
-        // Ignore parse errors, use defaults
+        // Parse error - clear cache and use defaults
+        localStorage.removeItem('gumtree_mvp_features')
       }
     }
     
@@ -228,9 +232,11 @@ export default function MVPLockdownPage() {
     }
   }, [])
 
-  // Save to localStorage
+  // Save to localStorage (only save if we have features)
   useEffect(() => {
-    localStorage.setItem('gumtree_mvp_features', JSON.stringify({ features }))
+    if (features && features.length > 0) {
+      localStorage.setItem('gumtree_mvp_features', JSON.stringify({ features }))
+    }
   }, [features])
 
   const handleLogin = () => {
