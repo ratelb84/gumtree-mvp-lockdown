@@ -183,7 +183,22 @@ const DEFAULT_FEATURES: Feature[] = [
 export default function MVPLockdownPage() {
   const [stage, setStage] = useState<Stage>('login')
   const [currentPerson, setCurrentPerson] = useState<Person | null>(null)
-  const [features, setFeatures] = useState<Feature[]>(DEFAULT_FEATURES)
+  const [features, setFeatures] = useState<Feature[]>(() => {
+    // Try to load from localStorage first
+    try {
+      const saved = localStorage.getItem('gumtree_mvp_features')
+      if (saved) {
+        const data = JSON.parse(saved)
+        if (data.features && Array.isArray(data.features) && data.features.length > 0) {
+          return data.features
+        }
+      }
+    } catch (e) {
+      // Ignore errors
+    }
+    // Fall back to DEFAULT_FEATURES
+    return [...DEFAULT_FEATURES]
+  })
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState('')
@@ -195,30 +210,8 @@ export default function MVPLockdownPage() {
   const [editTitle, setEditTitle] = useState('')
   const [editDesc, setEditDesc] = useState('')
 
-  // Load from localStorage
+  // Load saved credentials
   useEffect(() => {
-    let loadedFeatures = [...DEFAULT_FEATURES]
-    
-    const saved = localStorage.getItem('gumtree_mvp_features')
-    if (saved) {
-      try {
-        const data = JSON.parse(saved)
-        // Only use saved data if it has features
-        if (data.features && Array.isArray(data.features) && data.features.length > 0) {
-          loadedFeatures = data.features
-        } else {
-          // Clear bad cache and use defaults
-          localStorage.removeItem('gumtree_mvp_features')
-        }
-      } catch (e) {
-        // Parse error - clear cache and use defaults
-        localStorage.removeItem('gumtree_mvp_features')
-      }
-    }
-    
-    setFeatures(loadedFeatures)
-    
-    // Load saved credentials if remember me was checked
     const savedCreds = localStorage.getItem('gumtree_mvp_creds')
     if (savedCreds) {
       try {
@@ -314,12 +307,25 @@ export default function MVPLockdownPage() {
   }
 
   const getFeaturesInColumn = (column: Column) => {
-    return features.filter(f => f.column === column)
+    const result = features.filter(f => f.column === column)
+    // Debug log
+    if (typeof window !== 'undefined') {
+      console.log(`Features in ${column}:`, result.length)
+    }
+    return result
   }
 
   const getPersonFeatures = (person: Person) => {
     return features.filter(f => f.person === person)
   }
+  
+  // Debug: Log total features
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      console.log('Total features loaded:', features.length)
+      console.log('First feature:', features[0])
+    }
+  }, [features])
 
   // ============ LOGIN SCREEN ============
   if (stage === 'login') {
@@ -405,7 +411,7 @@ export default function MVPLockdownPage() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-white">GUMTREE MVP</h1>
-                <p className="text-xs text-gray-500">MVP • V1.1 • V2 • Backburner</p>
+                <p className="text-xs text-gray-500">MVP • V1.1 • V2 • Backburner • ({features.length} features)</p>
               </div>
             </div>
             <div className="flex gap-2 items-center ml-auto">
