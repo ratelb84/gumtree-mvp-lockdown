@@ -71,6 +71,7 @@ export default function MVPLockdownPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState('')
+  const [rememberMe, setRememberMe] = useState(false)
   const [input, setInput] = useState('')
   const [selectedColumn, setSelectedColumn] = useState<Column>('mvp')
   const [selectedCategory, setSelectedCategory] = useState<Category>('listings')
@@ -212,6 +213,19 @@ export default function MVPLockdownPage() {
     }
     
     setFeatures(loadedFeatures)
+    
+    // Load saved credentials if remember me was checked
+    const savedCreds = localStorage.getItem('gumtree_mvp_creds')
+    if (savedCreds) {
+      try {
+        const creds = JSON.parse(savedCreds)
+        setUsername(creds.username)
+        setPassword(creds.password)
+        setRememberMe(true)
+      } catch (e) {
+        // Ignore parse errors
+      }
+    }
   }, [])
 
   // Save to localStorage
@@ -232,10 +246,15 @@ export default function MVPLockdownPage() {
       return
     }
     
+    // Save credentials if remember me is checked
+    if (rememberMe) {
+      localStorage.setItem('gumtree_mvp_creds', JSON.stringify({ username, password }))
+    } else {
+      localStorage.removeItem('gumtree_mvp_creds')
+    }
+    
     setCurrentPerson(user[0] as Person)
     setStage('board')
-    setUsername('')
-    setPassword('')
   }
 
   const handleAddFeature = () => {
@@ -281,8 +300,10 @@ export default function MVPLockdownPage() {
   const handleLogout = () => {
     setCurrentPerson(null)
     setStage('login')
-    setUsername('')
-    setPassword('')
+    // Keep username/password if remember me was checked
+    if (!rememberMe) {
+      setPassword('')
+    }
     setLoginError('')
   }
 
@@ -332,6 +353,19 @@ export default function MVPLockdownPage() {
                   className="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20"
                   onKeyPress={e => e.key === 'Enter' && handleLogin()}
                 />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="remember"
+                  checked={rememberMe}
+                  onChange={e => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 rounded border-white/20 bg-black/30 cursor-pointer"
+                />
+                <label htmlFor="remember" className="text-sm text-gray-300 cursor-pointer">
+                  Remember me
+                </label>
               </div>
 
               {loginError && (
