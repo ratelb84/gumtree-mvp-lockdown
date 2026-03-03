@@ -348,16 +348,21 @@ export default function MVPLockdownPage() {
   // Load from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('gumtree_mvp_features')
+    let loadedFeatures = DEFAULT_FEATURES
+    
     if (saved) {
       try {
         const data = JSON.parse(saved)
-        setFeatures(data.features || DEFAULT_FEATURES)
+        // Only use saved data if it has features
+        if (data.features && data.features.length > 0) {
+          loadedFeatures = data.features
+        }
       } catch (e) {
-        setFeatures(DEFAULT_FEATURES)
+        // Ignore parse errors, use defaults
       }
-    } else {
-      setFeatures(DEFAULT_FEATURES)
     }
+    
+    setFeatures(loadedFeatures)
   }, [])
 
   // Save to localStorage
