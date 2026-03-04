@@ -9,9 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@prisma/client": "^7.4.2",
     "@supabase/supabase-js": "^2.98.0",
+    "better-sqlite3": "^12.6.2",
     "next": "^16.1.0",
     "pg": "^8.19.0",
+    "prisma": "^7.4.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
