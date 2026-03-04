@@ -5,3 +5,4 @@ const config: NextConfig = {
 }
 
 export default config
+// Rebuild trigger: Wed Mar  4 12:01:15 GMT 2026
