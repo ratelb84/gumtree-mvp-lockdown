@@ -9,59 +9,75 @@
 <body class="bg-slate-900">
     <div id="app"></div>
     <script>
-        const FEATURES = [
-            { id: 'mvp-1', title: 'Post Listing with Photos', desc: 'Title, description, price, category, location, up to 6 photos', col: 'mvp' },
-            { id: 'mvp-2', title: 'Edit/Delete/Pause Listings', desc: 'Owner can modify or remove listings', col: 'mvp' },
-            { id: 'mvp-3', title: 'Browse Listings Grid', desc: 'Category browsing, pagination, responsive layout', col: 'mvp' },
-            { id: 'mvp-4', title: 'Listing Detail Page', desc: 'Gallery, seller info, delivery options', col: 'mvp' },
-            { id: 'mvp-5', title: 'Top 10 Categories', desc: 'Cars, Property, Jobs, Electronics, Home, Services...', col: 'mvp' },
-            { id: 'mvp-6', title: 'Full-Text Search', desc: 'Search across title + description', col: 'mvp' },
-            { id: 'mvp-7', title: 'Advanced Filters', desc: 'Category, location, price range, condition', col: 'mvp' },
-            { id: 'mvp-8', title: 'Sort & Browse', desc: 'Sort by newest, price, relevance', col: 'mvp' },
-            { id: 'mvp-9', title: 'Favourites & Saved Items', desc: 'Heart icon, saved items page', col: 'mvp' },
-            { id: 'mvp-10', title: 'User Registration & Auth', desc: 'Email signup, login, password reset', col: 'mvp' },
-            { id: 'mvp-11', title: 'Seller Profile Management', desc: 'Profile creation, business info, bank details', col: 'mvp' },
-            { id: 'mvp-12', title: 'Buyer Account Dashboard', desc: 'Order history, saved items, account settings', col: 'mvp' },
-            { id: 'mvp-13', title: 'Seller Ratings & Reviews', desc: 'Star ratings, review text, transaction history', col: 'mvp' },
-            { id: 'mvp-14', title: 'Buy Now Checkout', desc: 'One-click purchase, delivery selection', col: 'mvp' },
-            { id: 'mvp-15', title: 'Payment Integration', desc: 'Payfast/Peach integration, card payments in ZAR', col: 'mvp' },
-            { id: 'mvp-16', title: 'Escrow System', desc: 'Secure payment hold until buyer confirms receipt', col: 'mvp' },
-            { id: 'mvp-17', title: 'Courier Integration', desc: 'Pargo, Paxi, The Courier Guy integration', col: 'mvp' },
-            { id: 'mvp-18', title: 'Delivery Cost Calculator', desc: 'Auto-calculate based on weight/size', col: 'mvp' },
-            { id: 'mvp-19', title: 'Order Tracking', desc: 'Track status: Paid → Shipped → Delivered', col: 'mvp' },
-            { id: 'mvp-20', title: 'Local Pickup Option', desc: 'Face-to-face meetups, in-person payment', col: 'mvp' },
-            { id: 'mvp-21', title: 'Buyer-Seller Messaging', desc: 'In-app chat for pre-purchase questions', col: 'mvp' },
-            { id: 'mvp-22', title: 'Message Notifications', desc: 'Push/email notifications for new messages', col: 'mvp' },
-            { id: 'mvp-23', title: 'Seller Wallet', desc: 'Track earnings from completed sales', col: 'mvp' },
-            { id: 'mvp-24', title: 'EFT Payouts', desc: 'Request payout to linked bank account', col: 'mvp' },
-            { id: 'mvp-25', title: 'Platform Fee Structure', desc: 'Zero seller fees, buyer protection fee', col: 'mvp' },
-            { id: 'mvp-26', title: 'Buyer Protection Policy', desc: 'All purchases covered - refund guarantee', col: 'mvp' },
-            { id: 'mvp-27', title: 'Dispute Resolution', desc: 'Buyer raises issue → admin reviews → refund', col: 'mvp' },
-            { id: 'mvp-28', title: 'Item Received Confirmation', desc: 'Buyer confirms delivery, triggers payout', col: 'mvp' },
-            { id: 'mvp-29', title: 'Make an Offer Feature', desc: 'Buyers negotiate price, sellers counter-offer', col: 'mvp' },
-            { id: 'mvp-30', title: 'Mobile-First Design', desc: 'Responsive layout, optimized for mobile', col: 'mvp' },
-            { id: 'mvp-31', title: 'Tech Stack Setup', desc: 'Next.js, PostgreSQL, Prisma, Vercel', col: 'mvp' },
-            { id: 'mvp-32', title: 'Database Schema', desc: 'Users, listings, orders, wallets, messages', col: 'mvp' },
-            { id: 'mvp-33', title: 'Image Pipeline', desc: 'S3/R2 upload, auto-resize, CDN delivery', col: 'mvp' },
-            { id: 'mvp-34', title: 'Admin Dashboard', desc: 'User management, dispute resolution', col: 'mvp' },
+        const CATEGORIES = {
+            listings: '📦 Listings',
+            search: '🔍 Search',
+            auth: '🔐 Auth',
+            checkout: '🛒 Checkout',
+            delivery: '🚚 Delivery',
+            messaging: '💬 Messaging',
+            'seller-tools': '💰 Seller Tools',
+            'buyer-protection': '🛡️ Protection',
+            infrastructure: '🏗️ Infrastructure',
+        };
+
+        const DEFAULT_FEATURES = [
+            { id: 'mvp-1', title: 'Post Listing with Photos', description: 'Title, description, price, category, location, up to 6 photos, condition selector', category: 'listings', column_name: 'mvp' },
+            { id: 'mvp-2', title: 'Edit/Delete/Pause Listings', description: 'Owner can modify or remove listings anytime', category: 'listings', column_name: 'mvp' },
+            { id: 'mvp-3', title: 'Browse Listings Grid', description: 'Category browsing, pagination, responsive layout, grid view', category: 'listings', column_name: 'mvp' },
+            { id: 'mvp-4', title: 'Listing Detail Page', description: 'Gallery, seller info, delivery options, Buy Now button, ratings', category: 'listings', column_name: 'mvp' },
+            { id: 'mvp-5', title: 'Top 10 Categories', description: 'Cars, Property, Jobs, Electronics, Home, Services, Furniture, Fashion, Pets, Sports', category: 'listings', column_name: 'mvp' },
+            { id: 'mvp-6', title: 'Full-Text Search', description: 'Search across title + description, instant results', category: 'search', column_name: 'mvp' },
+            { id: 'mvp-7', title: 'Advanced Filters', description: 'Category, location (province/city), price range, condition', category: 'search', column_name: 'mvp' },
+            { id: 'mvp-8', title: 'Sort & Browse', description: 'Sort by newest, price (asc/desc), relevance', category: 'search', column_name: 'mvp' },
+            { id: 'mvp-9', title: 'Favourites & Saved Items', description: 'Heart icon, saved items page, wishlist notifications', category: 'search', column_name: 'mvp' },
+            { id: 'mvp-10', title: 'User Registration & Auth', description: 'Email signup, login, password reset, remember me', category: 'auth', column_name: 'mvp' },
+            { id: 'mvp-11', title: 'Seller Profile Management', description: 'Profile creation, business info, bank details for payouts, verification', category: 'auth', column_name: 'mvp' },
+            { id: 'mvp-12', title: 'Buyer Account Dashboard', description: 'Order history, saved items, active purchases, account settings', category: 'auth', column_name: 'mvp' },
+            { id: 'mvp-13', title: 'Seller Ratings & Reviews', description: 'Star ratings, review text, transaction history visibility', category: 'auth', column_name: 'mvp' },
+            { id: 'mvp-14', title: 'Buy Now Checkout', description: 'One-click purchase, delivery selection, payment gateway', category: 'checkout', column_name: 'mvp' },
+            { id: 'mvp-15', title: 'Payment Integration', description: 'Payfast/Peach integration, card payments in ZAR, split payments API', category: 'checkout', column_name: 'mvp' },
+            { id: 'mvp-16', title: 'Escrow System', description: 'Secure payment hold until buyer confirms receipt, auto-release timer (7 days)', category: 'checkout', column_name: 'mvp' },
+            { id: 'mvp-17', title: 'Courier Integration', description: 'Pargo, Paxi, The Courier Guy - automated label generation', category: 'delivery', column_name: 'mvp' },
+            { id: 'mvp-18', title: 'Delivery Cost Calculator', description: 'Auto-calculate based on weight/size and destination, display at checkout', category: 'delivery', column_name: 'mvp' },
+            { id: 'mvp-19', title: 'Order Tracking', description: 'Track status: Paid → Shipped → Delivered → Complete, courier links', category: 'delivery', column_name: 'mvp' },
+            { id: 'mvp-20', title: 'Local Pickup Option', description: 'Allow face-to-face meetups, in-person payment, address sharing', category: 'delivery', column_name: 'mvp' },
+            { id: 'mvp-21', title: 'Buyer-Seller Messaging', description: 'In-app chat for pre-purchase questions, real-time notifications', category: 'messaging', column_name: 'mvp' },
+            { id: 'mvp-22', title: 'Message Notifications', description: 'Push/email notifications for new messages, badge counters', category: 'messaging', column_name: 'mvp' },
+            { id: 'mvp-23', title: 'Seller Wallet', description: 'Track earnings from completed sales, balance display, transaction history', category: 'seller-tools', column_name: 'mvp' },
+            { id: 'mvp-24', title: 'EFT Payouts', description: 'Request payout to linked bank account, settlement within 3-5 business days', category: 'seller-tools', column_name: 'mvp' },
+            { id: 'mvp-25', title: 'Platform Fee Structure', description: 'Zero seller fees, 3-5% buyer protection fee, optional boost/promotion fees', category: 'seller-tools', column_name: 'mvp' },
+            { id: 'mvp-26', title: 'Buyer Protection Policy', description: 'All purchases covered - item not as described = refund', category: 'buyer-protection', column_name: 'mvp' },
+            { id: 'mvp-27', title: 'Dispute Resolution', description: 'Buyer raises issue → admin reviews → refund or release funds', category: 'buyer-protection', column_name: 'mvp' },
+            { id: 'mvp-28', title: 'Item Received Confirmation', description: 'Buyer confirms delivery, triggers seller payout, auto-release timer', category: 'buyer-protection', column_name: 'mvp' },
+            { id: 'mvp-29', title: 'Make an Offer Feature', description: 'Buyers can negotiate price, sellers counter-offer, drives engagement', category: 'checkout', column_name: 'mvp' },
+            { id: 'mvp-30', title: 'Mobile-First Design', description: 'Responsive layout, optimized for mobile (~70% traffic), touch-friendly', category: 'infrastructure', column_name: 'mvp' },
+            { id: 'mvp-31', title: 'Tech Stack Setup', description: 'Next.js 15, PostgreSQL, Prisma, Vercel deployment, CI/CD', category: 'infrastructure', column_name: 'mvp' },
+            { id: 'mvp-32', title: 'Database Schema', description: 'Users, listings, orders, wallets, messages, disputes, ratings', category: 'infrastructure', column_name: 'mvp' },
+            { id: 'mvp-33', title: 'Image Pipeline', description: 'S3/R2 upload, auto-resize, WebP conversion, CDN delivery', category: 'infrastructure', column_name: 'mvp' },
+            { id: 'mvp-34', title: 'Admin Dashboard', description: 'User management, dispute resolution, fee configuration', category: 'infrastructure', column_name: 'mvp' },
         ];
 
-        let features = JSON.parse(localStorage.getItem('gumtree_features')) || FEATURES;
+        let features = JSON.parse(localStorage.getItem('gumtree_features')) || DEFAULT_FEATURES;
+        let editingId = null;
 
         function render() {
             const html = `
                 <div class="min-h-screen bg-slate-900">
                     <header class="bg-slate-800 p-4 border-b border-slate-700">
                         <h1 class="text-2xl font-bold text-white">🌳 Gumtree MVP Board</h1>
-                        <p class="text-gray-400 text-sm mt-1">${features.length} features • All persisted locally</p>
+                        <p class="text-gray-400 text-sm mt-1">${features.length} features</p>
                     </header>
                     
                     <main class="p-6">
                         <form onsubmit="addFeature(event)" class="mb-6 bg-slate-800 p-4 rounded-lg border border-slate-700">
                             <h3 class="text-white font-semibold mb-3">Add Feature</h3>
-                            <input type="text" id="title" placeholder="Feature title" class="w-full bg-slate-700 text-white px-3 py-2 rounded mb-3 border border-slate-600" />
+                            <input type="text" id="title" placeholder="Feature title" class="w-full bg-slate-700 text-white px-3 py-2 rounded mb-3 border border-slate-600" required />
                             <textarea id="desc" placeholder="Description" class="w-full bg-slate-700 text-white px-3 py-2 rounded mb-3 border border-slate-600" rows="2"></textarea>
                             <div class="flex gap-2">
+                                <select id="cat" class="bg-slate-700 text-white px-3 py-2 rounded border border-slate-600">
+                                    ${Object.entries(CATEGORIES).map(([k,v]) => `<option value="${k}">${v}</option>`).join('')}
+                                </select>
                                 <select id="col" class="bg-slate-700 text-white px-3 py-2 rounded border border-slate-600">
                                     <option value="mvp">MVP</option>
                                     <option value="v1.1">V1.1</option>
@@ -75,20 +91,29 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             ${['mvp', 'v1.1', 'v2', 'backburner'].map(col => `
                                 <div class="bg-slate-800 rounded-lg p-4 border border-slate-700">
-                                    <h2 class="font-bold text-white mb-4">
-                                        ${col === 'mvp' ? '🔴 MVP' : col === 'v1.1' ? '🟡 V1.1' : col === 'v2' ? '🟢 V2' : '⚫ Backburner'}
-                                    </h2>
+                                    <h2 class="font-bold text-white mb-4">${col === 'mvp' ? '🔴 MVP' : col === 'v1.1' ? '🟡 V1.1' : col === 'v2' ? '🟢 V2' : '⚫ Backburner'}</h2>
                                     <div class="space-y-2">
-                                        ${features.filter(f => f.col === col).map(f => `
+                                        ${features.filter(f => f.column_name === col).map(f => `
                                             <div class="bg-slate-700 p-3 rounded text-white text-sm border border-slate-600">
-                                                <p class="font-semibold">${f.title}</p>
-                                                <p class="text-xs opacity-75 mt-1">${f.desc}</p>
-                                                <div class="flex gap-1 mt-2 flex-wrap">
-                                                    ${col !== 'mvp' ? `<button onclick="move('${f.id}', 'mvp')" class="text-xs bg-blue-600 px-2 py-1 rounded">← MVP</button>` : ''}
-                                                    ${col !== 'v1.1' ? `<button onclick="move('${f.id}', 'v1.1')" class="text-xs bg-blue-600 px-2 py-1 rounded">→ V1.1</button>` : ''}
-                                                    ${col !== 'v2' ? `<button onclick="move('${f.id}', 'v2')" class="text-xs bg-blue-600 px-2 py-1 rounded">→ V2</button>` : ''}
-                                                    <button onclick="del('${f.id}')" class="text-xs bg-red-600 px-2 py-1 rounded ml-auto">🗑️</button>
-                                                </div>
+                                                ${editingId === f.id ? `
+                                                    <input type="text" id="edit-title-${f.id}" value="${f.title}" class="w-full bg-slate-600 text-white px-2 py-1 rounded mb-2 border border-slate-500" />
+                                                    <textarea id="edit-desc-${f.id}" class="w-full bg-slate-600 text-white px-2 py-1 rounded mb-2 border border-slate-500" rows="2">${f.description}</textarea>
+                                                    <div class="flex gap-1">
+                                                        <button onclick="saveEdit('${f.id}')" class="flex-1 text-xs bg-blue-600 px-2 py-1 rounded">Save</button>
+                                                        <button onclick="cancelEdit()" class="flex-1 text-xs bg-gray-600 px-2 py-1 rounded">Cancel</button>
+                                                    </div>
+                                                ` : `
+                                                    <p class="font-semibold">${f.title}</p>
+                                                    <p class="text-xs opacity-75 mt-1">${f.description || ''}</p>
+                                                    <p class="text-xs opacity-50 mt-1">${CATEGORIES[f.category] || f.category}</p>
+                                                    <div class="flex gap-1 mt-2 flex-wrap">
+                                                        <button onclick="editFeature('${f.id}')" class="text-xs bg-blue-600 px-2 py-1 rounded">✏️ Edit</button>
+                                                        ${col !== 'mvp' ? `<button onclick="moveFeature('${f.id}', 'mvp')" class="text-xs bg-purple-600 px-2 py-1 rounded">← MVP</button>` : ''}
+                                                        ${col !== 'v1.1' ? `<button onclick="moveFeature('${f.id}', 'v1.1')" class="text-xs bg-purple-600 px-2 py-1 rounded">→ V1.1</button>` : ''}
+                                                        ${col !== 'v2' ? `<button onclick="moveFeature('${f.id}', 'v2')" class="text-xs bg-purple-600 px-2 py-1 rounded">→ V2</button>` : ''}
+                                                        <button onclick="deleteFeature('${f.id}')" class="text-xs bg-red-600 px-2 py-1 rounded ml-auto">🗑️</button>
+                                                    </div>
+                                                `}
                                             </div>
                                         `).join('')}
                                     </div>
@@ -110,21 +135,40 @@
             e.preventDefault();
             const title = document.getElementById('title').value;
             const desc = document.getElementById('desc').value;
+            const cat = document.getElementById('cat').value;
             const col = document.getElementById('col').value;
             if (!title) return;
-            features.push({ id: `custom-${Date.now()}`, title, desc, col });
+            features.push({ id: `custom-${Date.now()}`, title, description: desc, category: cat, column_name: col });
             save();
             document.getElementById('title').value = '';
             document.getElementById('desc').value = '';
         }
 
-        function del(id) {
+        function editFeature(id) {
+            editingId = id;
+            render();
+        }
+
+        function saveEdit(id) {
+            const title = document.getElementById(`edit-title-${id}`).value;
+            const desc = document.getElementById(`edit-desc-${id}`).value;
+            features = features.map(f => f.id === id ? { ...f, title, description: desc } : f);
+            editingId = null;
+            save();
+        }
+
+        function cancelEdit() {
+            editingId = null;
+            render();
+        }
+
+        function deleteFeature(id) {
             features = features.filter(f => f.id !== id);
             save();
         }
 
-        function move(id, col) {
-            features = features.map(f => f.id === id ? { ...f, col } : f);
+        function moveFeature(id, col) {
+            features = features.map(f => f.id === id ? { ...f, column_name: col } : f);
             save();
         }
 
@@ -132,4 +176,3 @@
     </script>
 </body>
 </html>
-// Deploy trigger: Wed Mar  4 12:14:29 GMT 2026
