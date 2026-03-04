@@ -11,229 +11,136 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .card-hover { transition: all 0.2s ease; }
         .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-        .gumtree-logo {
-            font-size: 24px;
-            font-weight: bold;
-            letter-spacing: -1px;
-        }
         .gumtree-green { color: #56BA3D; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-    <div id="app" class="min-h-screen"></div>
+    <div id="app" class="min-h-screen">Loading...</div>
     
     <script>
-        // ============================================================================
-        // SUPABASE CONFIG
-        // ============================================================================
-        const supabaseUrl = localStorage.getItem('supabase_url') || 'https://hqfszlxdkvwlvpwqqmbd.supabase.co';
-        const supabaseKey = localStorage.getItem('supabase_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxZnN6bHhka3Z3bHZwd3FxbWJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTExODgsImV4cCI6MjA4ODEyNzE4OH0.4OlPny5uJFTslf6iWfF7fAaVl0x2I_VG63QPa1Amq8Q';
-        
+        // Supabase Config
+        const SUPABASE_URL = 'https://hqfszlxdkvwlvpwqqmbd.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxZnN6bHhka3Z3bHZwd3FxbWJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTExODgsImV4cCI6MjA4ODEyNzE4OH0.4OlPny5uJFTslf6iWfF7fAaVl0x2I_VG63QPa1Amq8Q';
+
         let supabase = null;
-        let supabaseReady = false;
-
-        try {
-            supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-            supabaseReady = true;
-            console.log('✅ Supabase connected');
-        } catch (e) {
-            console.error('Supabase error:', e);
-        }
-
-        const CATEGORIES = {
-            listings: { icon: '📦', label: 'Listings & Browsing' },
-            search: { icon: '🔍', label: 'Search & Discovery' },
-            auth: { icon: '🔐', label: 'Account Management' },
-            checkout: { icon: '🛒', label: 'Checkout & Payments' },
-            delivery: { icon: '🚚', label: 'Delivery & Logistics' },
-            messaging: { icon: '💬', label: 'Messaging & Support' },
-            'seller-tools': { icon: '💰', label: 'Seller Tools' },
-            'buyer-protection': { icon: '🛡️', label: 'Buyer Protection' },
-            infrastructure: { icon: '🏗️', label: 'Infrastructure' },
-            subscription: { icon: '💳', label: 'Subscription Revenue' },
-            advertising: { icon: '📢', label: 'Advertising' },
-        };
-
-        const DEFAULT_FEATURES = [
-            { id: 'mvp-1', title: 'Post Listing with Photos', description: 'Title, description, price, category, location, up to 6 photos', category: 'listings', column_name: 'mvp' },
-            { id: 'mvp-2', title: 'Edit/Delete/Pause Listings', description: 'Owner can modify or remove listings anytime', category: 'listings', column_name: 'mvp' },
-            { id: 'mvp-3', title: 'Browse Listings Grid', description: 'Category browsing, pagination, responsive layout', category: 'listings', column_name: 'mvp' },
-            { id: 'mvp-4', title: 'Listing Detail Page', description: 'Gallery, seller info, delivery options, ratings', category: 'listings', column_name: 'mvp' },
-            { id: 'mvp-5', title: 'Top 10 Categories', description: 'Cars, Property, Jobs, Electronics, Home, Services...', category: 'listings', column_name: 'mvp' },
-            { id: 'mvp-6', title: 'Full-Text Search', description: 'Search across title + description', category: 'search', column_name: 'mvp' },
-            { id: 'mvp-7', title: 'Advanced Filters', description: 'Category, location, price range, condition', category: 'search', column_name: 'mvp' },
-            { id: 'mvp-8', title: 'Sort & Browse', description: 'Sort by newest, price, relevance', category: 'search', column_name: 'mvp' },
-            { id: 'mvp-9', title: 'Favourites & Saved Items', description: 'Heart icon, saved items page', category: 'search', column_name: 'mvp' },
-            { id: 'mvp-10', title: 'User Registration & Auth', description: 'Email signup, login, password reset', category: 'auth', column_name: 'mvp' },
-            { id: 'mvp-11', title: 'Seller Profile Management', description: 'Profile, business info, bank details', category: 'auth', column_name: 'mvp' },
-            { id: 'mvp-12', title: 'Buyer Account Dashboard', description: 'Order history, saved items, settings', category: 'auth', column_name: 'mvp' },
-            { id: 'mvp-13', title: 'Seller Ratings & Reviews', description: 'Star ratings, review text, transaction history', category: 'auth', column_name: 'mvp' },
-            { id: 'mvp-14', title: 'Buy Now Checkout', description: 'One-click purchase, delivery selection', category: 'checkout', column_name: 'mvp' },
-            { id: 'mvp-15', title: 'Payment Integration', description: 'Payfast/Peach integration, ZAR payments', category: 'checkout', column_name: 'mvp' },
-            { id: 'mvp-16', title: 'Escrow System', description: 'Secure payment hold, auto-release timer', category: 'checkout', column_name: 'mvp' },
-            { id: 'mvp-17', title: 'Courier Integration', description: 'Pargo, Paxi, Courier Guy', category: 'delivery', column_name: 'mvp' },
-            { id: 'mvp-18', title: 'Delivery Cost Calculator', description: 'Auto-calculate by weight/size', category: 'delivery', column_name: 'mvp' },
-            { id: 'mvp-19', title: 'Order Tracking', description: 'Paid → Shipped → Delivered → Complete', category: 'delivery', column_name: 'mvp' },
-            { id: 'mvp-20', title: 'Local Pickup Option', description: 'Face-to-face meetups, in-person payment', category: 'delivery', column_name: 'mvp' },
-            { id: 'mvp-21', title: 'Buyer-Seller Messaging', description: 'In-app chat for pre-purchase', category: 'messaging', column_name: 'mvp' },
-            { id: 'mvp-22', title: 'Message Notifications', description: 'Push/email notifications', category: 'messaging', column_name: 'mvp' },
-            { id: 'mvp-23', title: 'Seller Wallet', description: 'Track earnings from sales', category: 'seller-tools', column_name: 'mvp' },
-            { id: 'mvp-24', title: 'EFT Payouts', description: 'Payout to bank account', category: 'seller-tools', column_name: 'mvp' },
-            { id: 'mvp-25', title: 'Platform Fee Structure', description: 'Zero seller fees, buyer protection fee', category: 'seller-tools', column_name: 'mvp' },
-            { id: 'mvp-26', title: 'Buyer Protection Policy', description: 'All purchases covered - refund guarantee', category: 'buyer-protection', column_name: 'mvp' },
-            { id: 'mvp-27', title: 'Dispute Resolution', description: 'Buyer issue → admin review → resolution', category: 'buyer-protection', column_name: 'mvp' },
-            { id: 'mvp-28', title: 'Item Received Confirmation', description: 'Buyer confirms, payout triggers', category: 'buyer-protection', column_name: 'mvp' },
-            { id: 'mvp-29', title: 'Make an Offer Feature', description: 'Negotiate price, counter-offers', category: 'checkout', column_name: 'mvp' },
-            { id: 'mvp-30', title: 'Mobile-First Design', description: 'Responsive, mobile optimized', category: 'infrastructure', column_name: 'mvp' },
-            { id: 'mvp-31', title: 'Tech Stack Setup', description: 'Next.js, PostgreSQL, Vercel CI/CD', category: 'infrastructure', column_name: 'mvp' },
-            { id: 'mvp-32', title: 'Database Schema', description: 'Users, listings, orders, wallets', category: 'infrastructure', column_name: 'mvp' },
-            { id: 'mvp-33', title: 'Image Pipeline', description: 'Upload, resize, CDN delivery', category: 'infrastructure', column_name: 'mvp' },
-            { id: 'mvp-34', title: 'Admin Dashboard', description: 'User management, disputes, fees', category: 'infrastructure', column_name: 'mvp' },
-        ];
-
         let currentUser = null;
-        let features = JSON.parse(localStorage.getItem('gumtree_features')) || DEFAULT_FEATURES;
+        let features = [];
         let editingId = null;
         let isSignup = false;
 
-        // ============================================================================
-        // AUTH FUNCTIONS
-        // ============================================================================
-        window.handleSignUp = async function(e) {
-            e.preventDefault();
-            if (!supabaseReady) {
-                alert('Supabase not configured. See setup instructions.');
-                return;
-            }
+        const CATEGORIES = {
+            listings: { icon: '📦', label: 'Listings' },
+            search: { icon: '🔍', label: 'Search' },
+            auth: { icon: '🔐', label: 'Auth' },
+            checkout: { icon: '🛒', label: 'Checkout' },
+            delivery: { icon: '🚚', label: 'Delivery' },
+            messaging: { icon: '💬', label: 'Messaging' },
+            'seller-tools': { icon: '💰', label: 'Seller Tools' },
+            'buyer-protection': { icon: '🛡️', label: 'Protection' },
+            infrastructure: { icon: '🏗️', label: 'Infrastructure' },
+            subscription: { icon: '💳', label: 'Subscription' },
+            advertising: { icon: '📢', label: 'Advertising' },
+        };
 
-            const email = document.getElementById('auth-email').value;
-            const name = document.getElementById('auth-name').value;
-            const password = document.getElementById('auth-password').value;
-
+        // Initialize
+        async function init() {
             try {
-                const { data, error } = await supabase.auth.signUp({
-                    email,
-                    password,
-                    options: {
-                        data: { name }
-                    }
-                });
-
-                if (error) throw error;
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
                 
-                alert('Check your email to confirm signup!');
-                isSignup = false;
+                // Check if logged in
+                const { data } = await supabase.auth.getSession();
+                if (data.session) {
+                    currentUser = data.session.user;
+                    await loadFeatures();
+                }
+                
                 render();
             } catch (e) {
-                alert('Signup error: ' + e.message);
+                console.error('Init error:', e);
+                showError('Failed to initialize: ' + e.message);
             }
-        };
+        }
 
-        window.handleLogIn = async function(e) {
-            e.preventDefault();
-            if (!supabaseReady) {
-                alert('Supabase not configured. See setup instructions.');
-                return;
-            }
-
-            const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-password').value;
-
-            try {
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email,
-                    password
-                });
-
-                if (error) throw error;
-                
-                currentUser = data.user;
-                await loadFeatures();
-                render();
-            } catch (e) {
-                alert('Login error: ' + e.message);
-            }
-        };
-
-        window.handleLogout = async function() {
-            if (confirm('Logout?')) {
-                await supabase.auth.signOut();
-                currentUser = null;
-                features = [];
-                render();
-            }
-        };
-
-        // ============================================================================
-        // FEATURE FUNCTIONS
-        // ============================================================================
+        // Load features from database
         async function loadFeatures() {
-            if (!supabaseReady || !currentUser) return;
-
             try {
+                if (!currentUser) return;
+                
                 const { data, error } = await supabase
                     .from('features')
                     .select('*')
                     .eq('user_id', currentUser.id);
-
+                
                 if (error) throw error;
-                
-                if (data && data.length > 0) {
-                    features = data;
-                } else {
-                    // First time - load defaults
-                    features = DEFAULT_FEATURES;
-                    for (let f of features) {
-                        await supabase.from('features').insert({
-                            id: f.id,
-                            user_id: currentUser.id,
-                            title: f.title,
-                            description: f.description,
-                            category: f.category,
-                            column_name: f.column_name
-                        });
-                    }
-                }
-                
-                setupRealtimeListener();
+                features = data || [];
             } catch (e) {
                 console.error('Load features error:', e);
             }
         }
 
-        function setupRealtimeListener() {
-            if (!supabaseReady || !currentUser) return;
-
-            supabase
-                .channel(`features:${currentUser.id}`)
-                .on('postgres_changes', 
-                    { event: '*', schema: 'public', table: 'features', filter: `user_id=eq.${currentUser.id}` },
-                    () => {
-                        loadFeatures();
-                    }
-                )
-                .subscribe();
-        }
-
-        window.addFeature = async function(e) {
+        // Auth handlers
+        window.handleSignUp = async (e) => {
             e.preventDefault();
-            if (!supabaseReady || !currentUser) return;
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const name = document.getElementById('auth-name').value;
+            
+            try {
+                const { data, error } = await supabase.auth.signUp({ email, password });
+                if (error) throw error;
+                alert('Check your email to confirm!');
+                isSignup = false;
+                render();
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        };
 
+        window.handleLogin = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                currentUser = data.user;
+                await loadFeatures();
+                render();
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        };
+
+        window.handleLogout = async () => {
+            await supabase.auth.signOut();
+            currentUser = null;
+            features = [];
+            render();
+        };
+
+        window.toggleAuthMode = () => {
+            isSignup = !isSignup;
+            render();
+        };
+
+        // Feature handlers
+        window.addFeature = async (e) => {
+            e.preventDefault();
             const title = document.getElementById('title').value;
             const desc = document.getElementById('desc').value;
             const cat = document.getElementById('cat').value;
             const col = document.getElementById('col').value;
-
+            
             try {
                 const { error } = await supabase.from('features').insert({
-                    id: `custom-${Date.now()}`,
+                    id: `f-${Date.now()}`,
                     user_id: currentUser.id,
                     title,
                     description: desc,
                     category: cat,
                     column_name: col
                 });
-
                 if (error) throw error;
                 
                 document.getElementById('title').value = '';
@@ -241,171 +148,101 @@
                 await loadFeatures();
                 render();
             } catch (e) {
-                alert('Error adding feature: ' + e.message);
+                alert('Error: ' + e.message);
             }
         };
 
-        window.editFeature = function(id) {
+        window.editFeature = (id) => {
             editingId = id;
             render();
         };
 
-        window.saveEdit = async function(id) {
-            if (!supabaseReady || !currentUser) return;
-
+        window.saveEdit = async (id) => {
             const title = document.getElementById(`edit-title-${id}`).value;
             const desc = document.getElementById(`edit-desc-${id}`).value;
-
+            
             try {
-                const { error } = await supabase
-                    .from('features')
+                const { error } = await supabase.from('features')
                     .update({ title, description: desc })
-                    .eq('id', id)
-                    .eq('user_id', currentUser.id);
-
+                    .eq('id', id);
                 if (error) throw error;
                 
                 editingId = null;
                 await loadFeatures();
                 render();
             } catch (e) {
-                alert('Error saving: ' + e.message);
+                alert('Error: ' + e.message);
             }
         };
 
-        window.cancelEdit = function() {
+        window.cancelEdit = () => {
             editingId = null;
             render();
         };
 
-        window.deleteFeature = async function(id) {
-            if (!confirm('Delete this feature?')) return;
-            if (!supabaseReady || !currentUser) return;
-
+        window.deleteFeature = async (id) => {
+            if (!confirm('Delete?')) return;
             try {
-                const { error } = await supabase
-                    .from('features')
-                    .delete()
-                    .eq('id', id)
-                    .eq('user_id', currentUser.id);
-
+                const { error } = await supabase.from('features').delete().eq('id', id);
                 if (error) throw error;
-                
                 await loadFeatures();
                 render();
             } catch (e) {
-                alert('Error deleting: ' + e.message);
+                alert('Error: ' + e.message);
             }
         };
 
-        window.moveFeature = async function(id, col) {
-            if (!supabaseReady || !currentUser) return;
-
+        window.moveFeature = async (id, col) => {
             try {
-                const { error } = await supabase
-                    .from('features')
+                const { error } = await supabase.from('features')
                     .update({ column_name: col })
-                    .eq('id', id)
-                    .eq('user_id', currentUser.id);
-
+                    .eq('id', id);
                 if (error) throw error;
-                
                 await loadFeatures();
                 render();
             } catch (e) {
-                alert('Error moving: ' + e.message);
+                alert('Error: ' + e.message);
             }
         };
 
-        // ============================================================================
-        // RENDER FUNCTIONS
-        // ============================================================================
-        function renderSetupNeeded() {
-            return `
-                <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4 py-8">
-                    <div class="w-full max-w-md">
-                        <div class="text-center mb-8">
-                            <div class="gumtree-logo mb-2 text-white">
-                                <span>gumtree</span><span class="gumtree-green">.</span><span>co.</span><span class="gumtree-green">za</span>
-                            </div>
-                            <p class="text-gray-400 text-sm">MVP Feature Board</p>
-                        </div>
+        function showError(msg) {
+            const app = document.getElementById('app');
+            app.innerHTML = `<div class="p-8 text-red-400">${msg}</div>`;
+        }
 
-                        <div class="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-yellow-500/20 rounded-xl p-8 shadow-2xl">
-                            <h2 class="text-xl font-bold text-yellow-400 mb-4">⚙️ Setup Required</h2>
-                            <p class="text-gray-300 text-sm mb-4">Supabase is not configured yet.</p>
-                            
-                            <ol class="text-gray-300 text-xs space-y-3 mb-6">
-                                <li class="flex gap-2">
-                                    <span class="text-yellow-400 font-bold">1.</span>
-                                    <span>Go to <a href="https://app.supabase.com" target="_blank" class="text-blue-400 underline">supabase.com</a> and create a project</span>
-                                </li>
-                                <li class="flex gap-2">
-                                    <span class="text-yellow-400 font-bold">2.</span>
-                                    <span>Copy your Project URL and API key</span>
-                                </li>
-                                <li class="flex gap-2">
-                                    <span class="text-yellow-400 font-bold">3.</span>
-                                    <span>Press F12, open Console, paste below (hit Enter):</span>
-                                </li>
-                            </ol>
-
-                            <div class="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg mb-4">
-                                <code class="text-xs bg-slate-700/50 px-3 py-3 rounded block text-blue-300 break-words" style="font-family: monospace;">
-localStorage.setItem('supabase_url', 'YOUR_PROJECT_URL');<br/>
-localStorage.setItem('supabase_key', 'YOUR_ANON_KEY');
-                                </code>
-                            </div>
-
-                            <button onclick="location.reload()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition">
-                                Refresh Page
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
+        function render() {
+            const app = document.getElementById('app');
+            if (!app) return;
+            
+            if (!currentUser) {
+                app.innerHTML = renderAuth();
+            } else {
+                app.innerHTML = renderBoard();
+            }
         }
 
         function renderAuth() {
             return `
-                <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4">
+                <div class="min-h-screen flex items-center justify-center px-4">
                     <div class="w-full max-w-md">
                         <div class="text-center mb-8">
-                            <div class="gumtree-logo mb-2">
-                                <span>gumtree</span><span class="gumtree-green">.</span><span>co.</span><span class="gumtree-green">za</span>
+                            <div style="font-size: 28px; font-weight: bold;">
+                                <span style="color: white;">gumtree</span><span class="gumtree-green">.</span><span style="color: white;">co.</span><span class="gumtree-green">za</span>
                             </div>
-                            <p class="text-gray-400 text-sm">MVP Feature Board</p>
+                            <p class="text-gray-400 text-sm mt-2">MVP Feature Board</p>
                         </div>
-
-                        <div class="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-blue-500/20 rounded-xl p-8 shadow-2xl">
-                            <h2 class="text-2xl font-bold text-white mb-6 text-center">${isSignup ? 'Sign Up' : 'Login'}</h2>
+                        
+                        <div class="bg-slate-800/50 border border-blue-500/20 rounded-xl p-8">
+                            <h2 class="text-2xl font-bold text-white mb-6">${isSignup ? 'Sign Up' : 'Login'}</h2>
                             
-                            <form onsubmit="${isSignup ? 'handleSignUp' : 'handleLogIn'}(event)" class="space-y-4">
-                                ${isSignup ? `
-                                    <div>
-                                        <label class="text-gray-300 text-sm font-medium mb-2 block">Name</label>
-                                        <input type="text" id="auth-name" placeholder="Your name" class="w-full bg-slate-700/50 border border-slate-600 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder-gray-500" required />
-                                    </div>
-                                ` : ''}
-                                
-                                <div>
-                                    <label class="text-gray-300 text-sm font-medium mb-2 block">Email</label>
-                                    <input type="email" id="auth-email" placeholder="your@email.com" class="w-full bg-slate-700/50 border border-slate-600 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder-gray-500" required />
-                                </div>
-
-                                <div>
-                                    <label class="text-gray-300 text-sm font-medium mb-2 block">Password</label>
-                                    <input type="password" id="auth-password" placeholder="Password" class="w-full bg-slate-700/50 border border-slate-600 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder-gray-500" required />
-                                </div>
-
-                                <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold py-3 rounded-lg transition shadow-lg mt-6">
-                                    ${isSignup ? 'Sign Up' : 'Login'}
-                                </button>
+                            <form onsubmit="${isSignup ? 'handleSignUp' : 'handleLogin'}(event)" class="space-y-4">
+                                ${isSignup ? `<input type="text" id="auth-name" placeholder="Name" class="w-full bg-slate-700/50 border border-slate-600 text-white px-4 py-2 rounded-lg" required/>` : ''}
+                                <input type="email" id="auth-email" placeholder="Email" class="w-full bg-slate-700/50 border border-slate-600 text-white px-4 py-2 rounded-lg" required/>
+                                <input type="password" id="auth-password" placeholder="Password" class="w-full bg-slate-700/50 border border-slate-600 text-white px-4 py-2 rounded-lg" required/>
+                                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold">${isSignup ? 'Sign Up' : 'Login'}</button>
                             </form>
-
-                            <button onclick="toggleAuthMode()" class="w-full text-blue-400 hover:text-blue-300 text-sm mt-4 font-medium">
-                                ${isSignup ? 'Already have an account? Login' : "Don't have an account? Sign Up"}
-                            </button>
+                            
+                            <button onclick="toggleAuthMode()" class="w-full text-blue-400 text-sm mt-4">${isSignup ? 'Have account? Login' : 'No account? Sign Up'}</button>
                         </div>
                     </div>
                 </div>
@@ -414,91 +251,67 @@ localStorage.setItem('supabase_key', 'YOUR_ANON_KEY');
 
         function renderBoard() {
             return `
-                <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-                    <!-- Header -->
-                    <header class="bg-gradient-to-r from-blue-900 via-slate-800 to-slate-900 border-b border-blue-500/20 sticky top-0 z-50 shadow-xl">
-                        <div class="w-full px-4 py-3">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <div class="gumtree-logo text-lg">
-                                        <span class="text-white">gumtree</span><span class="gumtree-green">.</span><span class="text-white">co.</span><span class="gumtree-green">za</span>
-                                    </div>
-                                    <div class="border-l border-gray-600 pl-3">
-                                        <p class="text-blue-200 text-xs">MVP Board</p>
-                                        <p class="text-gray-400 text-xs">User: ${currentUser.email}</p>
-                                    </div>
-                                </div>
-                                <button onclick="handleLogout()" class="bg-red-600/30 hover:bg-red-600/50 text-red-300 text-xs px-3 py-1.5 rounded font-semibold transition">Logout</button>
+                <div>
+                    <header class="bg-gradient-to-r from-blue-900 to-slate-900 border-b border-blue-500/20 sticky top-0 z-50">
+                        <div class="px-4 py-3 flex justify-between items-center">
+                            <div style="font-size: 20px; font-weight: bold;">
+                                <span style="color: white;">gumtree</span><span class="gumtree-green">.</span><span style="color: white;">co.</span><span class="gumtree-green">za</span>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <p class="text-gray-300 text-sm">${currentUser.email}</p>
+                                <button onclick="handleLogout()" class="bg-red-600/30 hover:bg-red-600/50 text-red-300 text-xs px-3 py-1.5 rounded">Logout</button>
                             </div>
                         </div>
                     </header>
-
-                    <!-- Main Content -->
-                    <main class="w-full px-4 py-6">
-                        <!-- Add Feature Form -->
-                        <div class="mb-6 mx-4 bg-gradient-to-r from-slate-800 to-slate-800/50 border border-blue-500/20 rounded-xl p-4 shadow-xl">
-                            <h2 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
-                                <span>➕</span> Add New Feature
-                            </h2>
+                    
+                    <main class="px-4 py-6">
+                        <div class="mb-6 bg-slate-800/50 border border-blue-500/20 rounded-xl p-4">
+                            <h2 class="text-white font-bold mb-3">➕ Add Feature</h2>
                             <form onsubmit="addFeature(event)" class="space-y-2">
-                                <div>
-                                    <input type="text" id="title" placeholder="Feature title" class="w-full bg-slate-700/50 border border-slate-600 text-white px-3 py-2 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder-gray-400 text-sm" required />
-                                </div>
-                                <div>
-                                    <textarea id="desc" placeholder="Description (optional)" class="w-full bg-slate-700/50 border border-slate-600 text-white px-3 py-2 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder-gray-400 text-sm" rows="2"></textarea>
-                                </div>
-                                <div class="grid grid-cols-12 gap-2">
-                                    <select id="cat" class="col-span-5 bg-slate-700/50 border border-slate-600 text-white px-3 py-2 rounded-lg focus:outline-none focus:border-blue-500 text-sm">
+                                <input type="text" id="title" placeholder="Title" class="w-full bg-slate-700/50 border border-slate-600 text-white px-3 py-2 rounded-lg text-sm" required/>
+                                <textarea id="desc" placeholder="Description" class="w-full bg-slate-700/50 border border-slate-600 text-white px-3 py-2 rounded-lg text-sm" rows="2"></textarea>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <select id="cat" class="bg-slate-700/50 border border-slate-600 text-white px-3 py-2 rounded-lg text-sm">
                                         ${Object.entries(CATEGORIES).map(([k,v]) => `<option value="${k}">${v.icon} ${v.label}</option>`).join('')}
                                     </select>
-                                    <select id="col" class="col-span-3 bg-slate-700/50 border border-slate-600 text-white px-3 py-2 rounded-lg focus:outline-none focus:border-blue-500 text-sm">
-                                        <option value="mvp">🔴 MVP</option>
-                                        <option value="v1.1">🟡 V1.1</option>
-                                        <option value="v2">🟢 V2</option>
-                                        <option value="backburner">⚫ Backburner</option>
+                                    <select id="col" class="bg-slate-700/50 border border-slate-600 text-white px-3 py-2 rounded-lg text-sm">
+                                        <option value="mvp">MVP</option>
+                                        <option value="v1.1">V1.1</option>
+                                        <option value="v2">V2</option>
+                                        <option value="backburner">Backburner</option>
                                     </select>
-                                    <button type="submit" class="col-span-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition shadow-lg text-sm">Add</button>
+                                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-semibold">Add</button>
                                 </div>
                             </form>
                         </div>
-
-                        <!-- Kanban Board -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 px-4 pb-6">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             ${['mvp', 'v1.1', 'v2', 'backburner'].map(col => `
-                                <div class="flex flex-col bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 rounded-xl overflow-hidden shadow-xl hover:border-slate-600/50 transition h-full">
-                                    <div class="bg-gradient-to-r ${col === 'mvp' ? 'from-red-600/20 to-red-600/5 border-b border-red-500/20' : col === 'v1.1' ? 'from-yellow-600/20 to-yellow-600/5 border-b border-yellow-500/20' : col === 'v2' ? 'from-green-600/20 to-green-600/5 border-b border-green-500/20' : 'from-gray-600/20 to-gray-600/5 border-b border-gray-500/20'} px-4 py-3">
-                                        <h2 class="text-lg font-bold text-white">
-                                            ${col === 'mvp' ? '🔴 MVP' : col === 'v1.1' ? '🟡 V1.1' : col === 'v2' ? '🟢 V2' : '⚫ Backburner'}
-                                        </h2>
-                                        <p class="text-xs text-gray-400 mt-1">${features.filter(f => f.column_name === col).length} items</p>
+                                <div class="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden">
+                                    <div class="bg-slate-700/50 px-4 py-3">
+                                        <h3 class="text-white font-bold">${col === 'mvp' ? '🔴 MVP' : col === 'v1.1' ? '🟡 V1.1' : col === 'v2' ? '🟢 V2' : '⚫ Backburner'}</h3>
+                                        <p class="text-gray-400 text-xs mt-1">${features.filter(f => f.column_name === col).length} items</p>
                                     </div>
-                                    
-                                    <div class="flex-1 p-4 space-y-3 overflow-y-auto">
-                                        ${features.filter(f => f.column_name === col).length === 0 ? `
-                                            <p class="text-gray-500 text-xs text-center py-8">No features yet</p>
-                                        ` : features.filter(f => f.column_name === col).map(f => `
-                                            <div class="fade-in card-hover bg-slate-700/50 border border-slate-600/50 rounded-lg p-3 text-white group flex flex-col">
+                                    <div class="p-4 space-y-2 max-h-96 overflow-y-auto">
+                                        ${features.filter(f => f.column_name === col).map(f => `
+                                            <div class="bg-slate-700/50 border border-slate-600 rounded-lg p-3 text-white text-sm group">
                                                 ${editingId === f.id ? `
                                                     <div class="space-y-2">
-                                                        <input type="text" id="edit-title-${f.id}" value="${f.title}" class="w-full bg-slate-600 border border-slate-500 text-white px-2 py-1.5 rounded text-xs focus:outline-none focus:border-blue-500 font-semibold" />
-                                                        <textarea id="edit-desc-${f.id}" class="w-full bg-slate-600 border border-slate-500 text-white px-2 py-1.5 rounded text-xs focus:outline-none focus:border-blue-500" rows="2">${f.description || ''}</textarea>
+                                                        <input type="text" id="edit-title-${f.id}" value="${f.title}" class="w-full bg-slate-600 border border-slate-500 text-white px-2 py-1 rounded text-xs" />
+                                                        <textarea id="edit-desc-${f.id}" class="w-full bg-slate-600 border border-slate-500 text-white px-2 py-1 rounded text-xs" rows="2">${f.description || ''}</textarea>
                                                         <div class="flex gap-1">
-                                                            <button onclick="saveEdit('${f.id}')" class="flex-1 bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded text-xs font-semibold transition">Save</button>
-                                                            <button onclick="cancelEdit()" class="flex-1 bg-gray-600 hover:bg-gray-700 px-2 py-1 rounded text-xs font-semibold transition">Cancel</button>
+                                                            <button onclick="saveEdit('${f.id}')" class="flex-1 bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded text-xs">Save</button>
+                                                            <button onclick="cancelEdit()" class="flex-1 bg-gray-600 hover:bg-gray-700 px-2 py-1 rounded text-xs">Cancel</button>
                                                         </div>
                                                     </div>
                                                 ` : `
-                                                    <div class="flex-1">
-                                                        <p class="font-bold text-white text-xs leading-tight">${f.title}</p>
-                                                        ${f.description ? `<p class="text-xs text-gray-300 mt-1 leading-tight line-clamp-2">${f.description}</p>` : ''}
-                                                        <p class="text-xs text-blue-300 mt-2 font-medium">${CATEGORIES[f.category]?.icon} ${CATEGORIES[f.category]?.label}</p>
-                                                    </div>
-                                                    <div class="grid grid-cols-2 gap-1 mt-2 pt-2 border-t border-slate-600/50 opacity-0 group-hover:opacity-100 transition">
-                                                        <button onclick="editFeature('${f.id}')" class="bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 text-xs px-1.5 py-1 rounded text-xs font-semibold transition">✏️</button>
-                                                        ${col !== 'mvp' ? `<button onclick="moveFeature('${f.id}', 'mvp')" class="bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 text-xs px-1.5 py-1 rounded text-xs font-semibold transition">↶</button>` : ''}
-                                                        ${col !== 'v1.1' ? `<button onclick="moveFeature('${f.id}', 'v1.1')" class="bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 text-xs px-1.5 py-1 rounded text-xs font-semibold transition">→11</button>` : ''}
-                                                        ${col !== 'v2' ? `<button onclick="moveFeature('${f.id}', 'v2')" class="bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 text-xs px-1.5 py-1 rounded text-xs font-semibold transition">→2</button>` : ''}
-                                                        <button onclick="deleteFeature('${f.id}')" class="bg-red-600/30 hover:bg-red-600/50 text-red-200 text-xs px-1.5 py-1 rounded text-xs font-semibold transition">🗑️</button>
+                                                    <p class="font-bold">${f.title}</p>
+                                                    ${f.description ? `<p class="text-xs text-gray-300">${f.description}</p>` : ''}
+                                                    <p class="text-xs text-blue-300 mt-1">${CATEGORIES[f.category]?.icon} ${CATEGORIES[f.category]?.label}</p>
+                                                    <div class="flex gap-1 mt-2 opacity-0 group-hover:opacity-100">
+                                                        <button onclick="editFeature('${f.id}')" class="text-xs bg-blue-600/30 text-blue-300 px-2 py-1 rounded">Edit</button>
+                                                        <button onclick="deleteFeature('${f.id}')" class="text-xs bg-red-600/30 text-red-300 px-2 py-1 rounded">Delete</button>
+                                                        ${col !== 'mvp' ? `<button onclick="moveFeature('${f.id}', 'mvp')" class="text-xs bg-purple-600/30 text-purple-300 px-2 py-1 rounded">MVP</button>` : ''}
                                                     </div>
                                                 `}
                                             </div>
@@ -512,114 +325,8 @@ localStorage.setItem('supabase_key', 'YOUR_ANON_KEY');
             `;
         }
 
-        window.toggleAuthMode = function() {
-            isSignup = !isSignup;
-            render();
-        };
-
-        function render() {
-            try {
-                const app = document.getElementById('app');
-                if (!app) {
-                    console.error('No #app element found');
-                    return;
-                }
-                
-                if (!supabaseReady) {
-                    app.innerHTML = renderSetupNeeded();
-                } else if (!currentUser) {
-                    app.innerHTML = renderAuth();
-                } else {
-                    app.innerHTML = renderBoard();
-                }
-            } catch (e) {
-                console.error('Render error:', e);
-                document.getElementById('app').innerHTML = '<div style="color: red; padding: 20px;">Error: ' + e.message + '</div>';
-            }
-        }
-
-        // Initialize database tables if needed
-        async function ensureTables() {
-            if (!supabaseReady) return;
-            
-            try {
-                // Try to query features table - if it fails, we know table doesn't exist
-                const { error } = await supabase
-                    .from('features')
-                    .select('count')
-                    .limit(1);
-                
-                if (error && error.message.includes('does not exist')) {
-                    console.log('⚠️ Tables not found - trying to create them...');
-                    
-                    // Try to create tables via RPC if available
-                    // This uses Supabase's SQL execution capabilities
-                    const { error: createError } = await supabase.rpc('exec', {
-                        query: `
-                            create table if not exists public.users (
-                                id uuid primary key default gen_random_uuid(),
-                                email text unique not null,
-                                name text,
-                                created_at timestamp default now()
-                            );
-                            
-                            create table if not exists public.features (
-                                id text primary key,
-                                user_id uuid not null references public.users(id) on delete cascade,
-                                title text not null,
-                                description text,
-                                category text not null,
-                                column_name text not null,
-                                created_at timestamp default now(),
-                                updated_at timestamp default now()
-                            );
-                        `
-                    }).catch(() => ({ error: { message: 'rpc not available' } }));
-                    
-                    if (createError) {
-                        console.log('ℹ️ Auto-table creation not available. Please run SQL manually.');
-                        console.log('Check FINAL_SETUP.md for instructions.');
-                    } else {
-                        console.log('✅ Tables created successfully!');
-                    }
-                }
-            } catch (e) {
-                console.error('Table check error:', e);
-            }
-        }
-
-        // Check if user is already logged in
-        async function checkAuth() {
-            if (!supabaseReady) {
-                render();
-                return;
-            }
-
-            try {
-                // First, ensure tables exist
-                await ensureTables();
-                
-                const { data } = await supabase.auth.getSession();
-                if (data && data.session) {
-                    currentUser = data.session.user;
-                    await loadFeatures();
-                }
-            } catch (e) {
-                console.error('Auth check error:', e);
-            }
-            
-            render();
-        }
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            checkAuth();
-        });
-
-        // Fallback if DOMContentLoaded already fired
-        if (document.readyState !== 'loading') {
-            checkAuth();
-        }
+        // Start
+        window.addEventListener('load', init);
     </script>
 </body>
 </html>
