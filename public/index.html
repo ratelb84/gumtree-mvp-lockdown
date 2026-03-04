@@ -86,87 +86,85 @@
                 <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
                     <!-- Header -->
                     <header class="bg-gradient-to-r from-blue-900 via-slate-800 to-slate-900 border-b border-blue-500/20 sticky top-0 z-50 shadow-xl">
-                        <div class="max-w-7xl mx-auto px-6 py-6">
+                        <div class="w-full px-4 py-6">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <h1 class="text-3xl font-bold text-white">🌳 Gumtree MVP Board</h1>
-                                    <p class="text-blue-200 text-sm mt-1">${features.length} features • Real-time collaboration</p>
+                                    <h1 class="text-4xl font-bold text-white">🌳 Gumtree MVP Board</h1>
+                                    <p class="text-blue-200 text-base mt-2">${features.length} features • Real-time collaboration</p>
                                 </div>
                                 <div class="text-right text-sm text-gray-400">
-                                    Data persists locally
+                                    📍 Data persists locally
                                 </div>
                             </div>
                         </div>
                     </header>
 
                     <!-- Main Content -->
-                    <main class="max-w-7xl mx-auto px-6 py-8">
+                    <main class="w-full px-4 py-6">
                         <!-- Add Feature Form -->
-                        <div class="mb-8 bg-gradient-to-r from-slate-800 to-slate-800/50 border border-blue-500/20 rounded-xl p-6 shadow-xl">
+                        <div class="mb-8 mx-4 bg-gradient-to-r from-slate-800 to-slate-800/50 border border-blue-500/20 rounded-xl p-6 shadow-xl">
                             <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
                                 <span class="text-xl">➕</span> Add New Feature
                             </h2>
                             <form onsubmit="addFeature(event)" class="space-y-4">
                                 <div>
-                                    <input type="text" id="title" placeholder="Feature title" class="w-full bg-slate-700/50 border border-slate-600 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder-gray-400" required />
+                                    <input type="text" id="title" placeholder="Feature title" class="w-full bg-slate-700/50 border border-slate-600 text-white px-4 py-3.5 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder-gray-400 text-base" required />
                                 </div>
                                 <div>
-                                    <textarea id="desc" placeholder="Description (optional)" class="w-full bg-slate-700/50 border border-slate-600 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder-gray-400" rows="2"></textarea>
+                                    <textarea id="desc" placeholder="Description (optional)" class="w-full bg-slate-700/50 border border-slate-600 text-white px-4 py-3.5 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder-gray-400 text-base" rows="3"></textarea>
                                 </div>
-                                <div class="grid grid-cols-3 gap-3">
-                                    <select id="cat" class="bg-slate-700/50 border border-slate-600 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500">
+                                <div class="grid grid-cols-12 gap-3">
+                                    <select id="cat" class="col-span-5 bg-slate-700/50 border border-slate-600 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 text-base">
                                         ${Object.entries(CATEGORIES).map(([k,v]) => `<option value="${k}">${v.icon} ${v.label}</option>`).join('')}
                                     </select>
-                                    <select id="col" class="bg-slate-700/50 border border-slate-600 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500">
+                                    <select id="col" class="col-span-3 bg-slate-700/50 border border-slate-600 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 text-base">
                                         <option value="mvp">🔴 MVP</option>
                                         <option value="v1.1">🟡 V1.1</option>
                                         <option value="v2">🟢 V2</option>
                                         <option value="backburner">⚫ Backburner</option>
                                     </select>
-                                    <button type="submit" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg">Add Feature</button>
+                                    <button type="submit" class="col-span-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg text-base">Add Feature</button>
                                 </div>
                             </form>
                         </div>
 
                         <!-- Kanban Board -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-4 pb-8">
                             ${['mvp', 'v1.1', 'v2', 'backburner'].map(col => `
-                                <div class="flex flex-col bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 rounded-xl overflow-hidden shadow-xl hover:border-slate-600/50 transition">
-                                    <div class="bg-gradient-to-r ${col === 'mvp' ? 'from-red-600/20 to-red-600/5 border-b border-red-500/20' : col === 'v1.1' ? 'from-yellow-600/20 to-yellow-600/5 border-b border-yellow-500/20' : col === 'v2' ? 'from-green-600/20 to-green-600/5 border-b border-green-500/20' : 'from-gray-600/20 to-gray-600/5 border-b border-gray-500/20'} px-6 py-4">
-                                        <h2 class="text-lg font-bold text-white">
+                                <div class="flex flex-col bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 rounded-xl overflow-hidden shadow-xl hover:border-slate-600/50 transition h-full">
+                                    <div class="bg-gradient-to-r ${col === 'mvp' ? 'from-red-600/20 to-red-600/5 border-b border-red-500/20' : col === 'v1.1' ? 'from-yellow-600/20 to-yellow-600/5 border-b border-yellow-500/20' : col === 'v2' ? 'from-green-600/20 to-green-600/5 border-b border-green-500/20' : 'from-gray-600/20 to-gray-600/5 border-b border-gray-500/20'} px-5 py-5">
+                                        <h2 class="text-xl font-bold text-white">
                                             ${col === 'mvp' ? '🔴 MVP' : col === 'v1.1' ? '🟡 V1.1' : col === 'v2' ? '🟢 V2' : '⚫ Backburner'}
                                         </h2>
-                                        <p class="text-xs text-gray-400 mt-1">${features.filter(f => f.column_name === col).length} items</p>
+                                        <p class="text-sm text-gray-300 mt-2">${features.filter(f => f.column_name === col).length} items</p>
                                     </div>
                                     
-                                    <div class="flex-1 p-4 space-y-3 overflow-y-auto max-h-[600px]">
+                                    <div class="flex-1 p-4 space-y-3 overflow-y-auto">
                                         ${features.filter(f => f.column_name === col).length === 0 ? `
                                             <p class="text-gray-500 text-sm text-center py-8">No features yet</p>
                                         ` : features.filter(f => f.column_name === col).map(f => `
-                                            <div class="fade-in card-hover bg-slate-700/50 border border-slate-600/50 rounded-lg p-4 text-white text-sm group">
+                                            <div class="fade-in card-hover bg-slate-700/50 border border-slate-600/50 rounded-lg p-5 text-white group flex flex-col">
                                                 ${editingId === f.id ? `
-                                                    <div class="space-y-2">
-                                                        <input type="text" id="edit-title-${f.id}" value="${f.title}" class="w-full bg-slate-600 border border-slate-500 text-white px-3 py-2 rounded text-sm focus:outline-none focus:border-blue-500" />
-                                                        <textarea id="edit-desc-${f.id}" class="w-full bg-slate-600 border border-slate-500 text-white px-3 py-2 rounded text-sm focus:outline-none focus:border-blue-500" rows="2">${f.description || ''}</textarea>
-                                                        <div class="flex gap-1">
-                                                            <button onclick="saveEdit('${f.id}')" class="flex-1 bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded text-xs font-semibold transition">Save</button>
-                                                            <button onclick="cancelEdit()" class="flex-1 bg-gray-600 hover:bg-gray-700 px-2 py-1 rounded text-xs font-semibold transition">Cancel</button>
+                                                    <div class="space-y-3">
+                                                        <input type="text" id="edit-title-${f.id}" value="${f.title}" class="w-full bg-slate-600 border border-slate-500 text-white px-3 py-2.5 rounded text-sm focus:outline-none focus:border-blue-500 font-semibold" />
+                                                        <textarea id="edit-desc-${f.id}" class="w-full bg-slate-600 border border-slate-500 text-white px-3 py-2.5 rounded text-sm focus:outline-none focus:border-blue-500" rows="3">${f.description || ''}</textarea>
+                                                        <div class="flex gap-2">
+                                                            <button onclick="saveEdit('${f.id}')" class="flex-1 bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded text-sm font-semibold transition">Save</button>
+                                                            <button onclick="cancelEdit()" class="flex-1 bg-gray-600 hover:bg-gray-700 px-3 py-2 rounded text-sm font-semibold transition">Cancel</button>
                                                         </div>
                                                     </div>
                                                 ` : `
-                                                    <div class="flex justify-between items-start gap-2">
-                                                        <div class="flex-1">
-                                                            <p class="font-semibold text-white leading-tight">${f.title}</p>
-                                                            ${f.description ? `<p class="text-xs text-gray-400 mt-1">${f.description}</p>` : ''}
-                                                            <p class="text-xs text-blue-400 mt-2">${CATEGORIES[f.category]?.icon} ${CATEGORIES[f.category]?.label}</p>
-                                                        </div>
+                                                    <div class="flex-1">
+                                                        <p class="font-bold text-white text-sm leading-snug">${f.title}</p>
+                                                        ${f.description ? `<p class="text-xs text-gray-300 mt-2 leading-relaxed">${f.description}</p>` : ''}
+                                                        <p class="text-xs text-blue-300 mt-3 font-medium">${CATEGORIES[f.category]?.icon} ${CATEGORIES[f.category]?.label}</p>
                                                     </div>
-                                                    <div class="flex gap-1 mt-3 pt-3 border-t border-slate-600/50 opacity-0 group-hover:opacity-100 transition">
-                                                        <button onclick="editFeature('${f.id}')" class="flex-1 bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 text-xs px-2 py-1.5 rounded transition">✏️ Edit</button>
-                                                        ${col !== 'mvp' ? `<button onclick="moveFeature('${f.id}', 'mvp')" class="flex-1 bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 text-xs px-2 py-1.5 rounded transition">↶ MVP</button>` : ''}
-                                                        ${col !== 'v1.1' ? `<button onclick="moveFeature('${f.id}', 'v1.1')" class="flex-1 bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 text-xs px-2 py-1.5 rounded transition">→ V1.1</button>` : ''}
-                                                        ${col !== 'v2' ? `<button onclick="moveFeature('${f.id}', 'v2')" class="flex-1 bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 text-xs px-2 py-1.5 rounded transition">→ V2</button>` : ''}
-                                                        <button onclick="deleteFeature('${f.id}')" class="flex-1 bg-red-600/20 hover:bg-red-600/40 text-red-300 text-xs px-2 py-1.5 rounded transition">🗑️ Delete</button>
+                                                    <div class="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-600/50 opacity-0 group-hover:opacity-100 transition">
+                                                        <button onclick="editFeature('${f.id}')" class="bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 text-xs px-2 py-2 rounded font-semibold transition">✏️ Edit</button>
+                                                        ${col !== 'mvp' ? `<button onclick="moveFeature('${f.id}', 'mvp')" class="bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 text-xs px-2 py-2 rounded font-semibold transition">↶ MVP</button>` : ''}
+                                                        ${col !== 'v1.1' ? `<button onclick="moveFeature('${f.id}', 'v1.1')" class="bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 text-xs px-2 py-2 rounded font-semibold transition">→ V1.1</button>` : ''}
+                                                        ${col !== 'v2' ? `<button onclick="moveFeature('${f.id}', 'v2')" class="bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 text-xs px-2 py-2 rounded font-semibold transition">→ V2</button>` : ''}
+                                                        <button onclick="deleteFeature('${f.id}')" class="bg-red-600/30 hover:bg-red-600/50 text-red-200 text-xs px-2 py-2 rounded font-semibold transition">🗑️ Delete</button>
                                                     </div>
                                                 `}
                                             </div>
