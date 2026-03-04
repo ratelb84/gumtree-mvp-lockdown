@@ -101,7 +101,7 @@
         // ============================================================================
         // AUTH FUNCTIONS
         // ============================================================================
-        async function handleSignUp(e) {
+        window.handleSignUp = async function(e) {
             e.preventDefault();
             if (!supabaseReady) {
                 alert('Supabase not configured. See setup instructions.');
@@ -129,9 +129,9 @@
             } catch (e) {
                 alert('Signup error: ' + e.message);
             }
-        }
+        };
 
-        async function handleLogIn(e) {
+        window.handleLogIn = async function(e) {
             e.preventDefault();
             if (!supabaseReady) {
                 alert('Supabase not configured. See setup instructions.');
@@ -155,16 +155,16 @@
             } catch (e) {
                 alert('Login error: ' + e.message);
             }
-        }
+        };
 
-        async function handleLogout() {
+        window.handleLogout = async function() {
             if (confirm('Logout?')) {
                 await supabase.auth.signOut();
                 currentUser = null;
                 features = [];
                 render();
             }
-        }
+        };
 
         // ============================================================================
         // FEATURE FUNCTIONS
@@ -217,7 +217,7 @@
                 .subscribe();
         }
 
-        async function addFeature(e) {
+        window.addFeature = async function(e) {
             e.preventDefault();
             if (!supabaseReady || !currentUser) return;
 
@@ -245,14 +245,14 @@
             } catch (e) {
                 alert('Error adding feature: ' + e.message);
             }
-        }
+        };
 
-        async function editFeature(id) {
+        window.editFeature = function(id) {
             editingId = id;
             render();
-        }
+        };
 
-        async function saveEdit(id) {
+        window.saveEdit = async function(id) {
             if (!supabaseReady || !currentUser) return;
 
             const title = document.getElementById(`edit-title-${id}`).value;
@@ -273,14 +273,14 @@
             } catch (e) {
                 alert('Error saving: ' + e.message);
             }
-        }
+        };
 
-        function cancelEdit() {
+        window.cancelEdit = function() {
             editingId = null;
             render();
-        }
+        };
 
-        async function deleteFeature(id) {
+        window.deleteFeature = async function(id) {
             if (!confirm('Delete this feature?')) return;
             if (!supabaseReady || !currentUser) return;
 
@@ -298,9 +298,9 @@
             } catch (e) {
                 alert('Error deleting: ' + e.message);
             }
-        }
+        };
 
-        async function moveFeature(id, col) {
+        window.moveFeature = async function(id, col) {
             if (!supabaseReady || !currentUser) return;
 
             try {
@@ -317,17 +317,17 @@
             } catch (e) {
                 alert('Error moving: ' + e.message);
             }
-        }
+        };
 
         // ============================================================================
         // RENDER FUNCTIONS
         // ============================================================================
         function renderSetupNeeded() {
             return `
-                <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4">
+                <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4 py-8">
                     <div class="w-full max-w-md">
                         <div class="text-center mb-8">
-                            <div class="gumtree-logo mb-2">
+                            <div class="gumtree-logo mb-2 text-white">
                                 <span>gumtree</span><span class="gumtree-green">.</span><span>co.</span><span class="gumtree-green">za</span>
                             </div>
                             <p class="text-gray-400 text-sm">MVP Feature Board</p>
@@ -340,33 +340,27 @@
                             <ol class="text-gray-300 text-xs space-y-3 mb-6">
                                 <li class="flex gap-2">
                                     <span class="text-yellow-400 font-bold">1.</span>
-                                    <span>Open <code class="bg-slate-700/50 px-2 py-1 rounded">SUPABASE_SETUP.md</code> in the project folder</span>
+                                    <span>Go to <a href="https://app.supabase.com" target="_blank" class="text-blue-400 underline">supabase.com</a> and create a project</span>
                                 </li>
                                 <li class="flex gap-2">
                                     <span class="text-yellow-400 font-bold">2.</span>
-                                    <span>Follow all steps to create Supabase project</span>
+                                    <span>Copy your Project URL and API key</span>
                                 </li>
                                 <li class="flex gap-2">
                                     <span class="text-yellow-400 font-bold">3.</span>
-                                    <span>Copy credentials and paste in browser console (F12)</span>
-                                </li>
-                                <li class="flex gap-2">
-                                    <span class="text-yellow-400 font-bold">4.</span>
-                                    <span>Refresh this page</span>
+                                    <span>Press F12, open Console, paste below (hit Enter):</span>
                                 </li>
                             </ol>
 
                             <div class="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg mb-4">
-                                <p class="text-xs text-blue-300"><strong>Quick Setup:</strong></p>
-                                <code class="text-xs bg-slate-700/50 px-2 py-1 rounded block mt-2 break-words">
-                                    localStorage.setItem('supabase_url', 'YOUR_URL');
-                                    <br/>
-                                    localStorage.setItem('supabase_key', 'YOUR_KEY');
+                                <code class="text-xs bg-slate-700/50 px-3 py-3 rounded block text-blue-300 break-words" style="font-family: monospace;">
+localStorage.setItem('supabase_url', 'YOUR_PROJECT_URL');<br/>
+localStorage.setItem('supabase_key', 'YOUR_ANON_KEY');
                                 </code>
                             </div>
 
                             <button onclick="location.reload()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition">
-                                Refresh
+                                Refresh Page
                             </button>
                         </div>
                     </div>
@@ -520,20 +514,29 @@
             `;
         }
 
-        function toggleAuthMode() {
+        window.toggleAuthMode = function() {
             isSignup = !isSignup;
             render();
-        }
+        };
 
         function render() {
-            const app = document.getElementById('app');
-            
-            if (!supabaseReady) {
-                app.innerHTML = renderSetupNeeded();
-            } else if (!currentUser) {
-                app.innerHTML = renderAuth();
-            } else {
-                app.innerHTML = renderBoard();
+            try {
+                const app = document.getElementById('app');
+                if (!app) {
+                    console.error('No #app element found');
+                    return;
+                }
+                
+                if (!supabaseReady) {
+                    app.innerHTML = renderSetupNeeded();
+                } else if (!currentUser) {
+                    app.innerHTML = renderAuth();
+                } else {
+                    app.innerHTML = renderBoard();
+                }
+            } catch (e) {
+                console.error('Render error:', e);
+                document.getElementById('app').innerHTML = '<div style="color: red; padding: 20px;">Error: ' + e.message + '</div>';
             }
         }
 
@@ -546,18 +549,21 @@
 
             try {
                 const { data } = await supabase.auth.getSession();
-                if (data.session) {
+                if (data && data.session) {
                     currentUser = data.session.user;
                     await loadFeatures();
                 }
-                render();
             } catch (e) {
                 console.error('Auth check error:', e);
-                render();
             }
+            
+            render();
         }
 
-        checkAuth();
+        // Initialize
+        setTimeout(() => {
+            checkAuth();
+        }, 100);
     </script>
 </body>
 </html>
