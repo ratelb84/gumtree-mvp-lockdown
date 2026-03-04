@@ -5,15 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gumtree MVP Board</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .fade-in { animation: fadeIn 0.3s ease-in; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .card-hover { transition: all 0.2s ease; }
         .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-        .pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+        .gumtree-logo {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: -1px;
+        }
+        .gumtree-green { color: #56BA3D; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
@@ -21,30 +24,14 @@
     
     <script>
         // ============================================================================
-        // FIREBASE CONFIG - Update with your project credentials
-        // Get from: https://console.firebase.google.com
+        // SUPABASE CONFIG - Get from: https://app.supabase.com/projects
         // ============================================================================
-        const firebaseConfig = {
-            apiKey: localStorage.getItem('firebase_apiKey') || "",
-            projectId: localStorage.getItem('firebase_projectId') || "gumtree-mvp",
-            databaseURL: localStorage.getItem('firebase_databaseURL') || "https://gumtree-mvp.firebaseio.com"
-        };
-
-        let db = null;
-        let firebaseReady = false;
-
-        // Initialize Firebase
-        if (firebaseConfig.apiKey && firebaseConfig.projectId) {
-            try {
-                const app = firebase.initializeApp(firebaseConfig);
-                db = firebase.database(app);
-                firebaseReady = true;
-                console.log('✅ Firebase connected');
-            } catch (e) {
-                console.log('⚠️ Firebase unavailable, using localStorage');
-            }
-        } else {
-            console.log('ℹ️ Firebase not configured, using localStorage');
+        const supabaseUrl = localStorage.getItem('supabase_url') || '';
+        const supabaseKey = localStorage.getItem('supabase_key') || '';
+        
+        let supabase = null;
+        if (supabaseUrl && supabaseKey) {
+            supabase = supabase.createClient(supabaseUrl, supabaseKey);
         }
 
         const CATEGORIES = {
@@ -98,59 +85,123 @@
             { id: 'mvp-34', title: 'Admin Dashboard', description: 'User management, disputes, fees', category: 'infrastructure', column_name: 'mvp' },
         ];
 
+        let currentUser = null;
         let features = JSON.parse(localStorage.getItem('gumtree_features')) || DEFAULT_FEATURES;
         let editingId = null;
-        let syncStatus = firebaseReady ? 'synced' : 'offline';
 
-        // Setup Firebase real-time listener
-        function setupFirebaseListener() {
-            if (!db) return;
-            
-            db.ref('features').on('value', (snapshot) => {
-                if (snapshot.val()) {
-                    const fbFeatures = Object.values(snapshot.val());
-                    features = fbFeatures;
-                    localStorage.setItem('gumtree_features', JSON.stringify(features));
-                    syncStatus = 'synced';
-                    render();
-                }
-            }, (error) => {
-                console.error('Firebase sync error:', error);
-                syncStatus = 'error';
-            });
+        // Check stored login
+        function checkLogin() {
+            const stored = localStorage.getItem('gumtree_user');
+            if (stored) {
+                currentUser = JSON.parse(stored);
+                return true;
+            }
+            return false;
         }
 
-        function saveToDatabase() {
-            // Save to localStorage always
-            localStorage.setItem('gumtree_features', JSON.stringify(features));
+        function handleLogin(e) {
+            e.preventDefault();
+            const name = document.getElementById('login-name').value;
+            const password = document.getElementById('login-password').value;
             
-            // Also sync to Firebase if available
-            if (db) {
-                const fbData = {};
-                features.forEach((f, i) => {
-                    fbData[f.id] = f;
-                });
-                db.ref('features').set(fbData).catch(e => {
-                    console.error('Firebase write error:', e);
-                });
+            if (!name || !password) {
+                alert('Please enter name and password');
+                return;
             }
+
+            // Simple local auth (for MVP - in production use Supabase Auth)
+            currentUser = {
+                id: Math.random().toString(36).slice(2),
+                name: name,
+                email: `${name.toLowerCase()}@local`,
+                createdAt: new Date().toISOString()
+            };
+
+            localStorage.setItem('gumtree_user', JSON.stringify(currentUser));
+            localStorage.setItem('gumtree_features', JSON.stringify(DEFAULT_FEATURES));
+            features = DEFAULT_FEATURES;
+            render();
+        }
+
+        function handleLogout() {
+            if (confirm('Logout?')) {
+                currentUser = null;
+                localStorage.removeItem('gumtree_user');
+                render();
+            }
+        }
+
+        function saveFeatures() {
+            localStorage.setItem('gumtree_features', JSON.stringify(features));
+        }
+
+        function renderLogin() {
+            return `
+                <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4">
+                    <div class="w-full max-w-md">
+                        <!-- Gumtree Logo -->
+                        <div class="text-center mb-8">
+                            <div class="gumtree-logo mb-2">
+                                <span>gumtree</span><span class="gumtree-green">.</span><span>co.</span><span class="gumtree-green">za</span>
+                            </div>
+                            <p class="text-gray-400 text-sm">MVP Feature Board</p>
+                        </div>
+
+                        <!-- Login Card -->
+                        <div class="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-blue-500/20 rounded-xl p-8 shadow-2xl">
+                            <h2 class="text-2xl font-bold text-white mb-6 text-center">Login</h2>
+                            
+                            <form onsubmit="handleLogin(event)" class="space-y-4">
+                                <div>
+                                    <label class="text-gray-300 text-sm font-medium mb-2 block">Name</label>
+                                    <input type="text" id="login-name" placeholder="Your name" class="w-full bg-slate-700/50 border border-slate-600 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder-gray-500" required />
+                                </div>
+
+                                <div>
+                                    <label class="text-gray-300 text-sm font-medium mb-2 block">Password</label>
+                                    <input type="password" id="login-password" placeholder="Password" class="w-full bg-slate-700/50 border border-slate-600 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder-gray-500" required />
+                                </div>
+
+                                <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold py-3 rounded-lg transition shadow-lg mt-6">
+                                    Login
+                                </button>
+                            </form>
+
+                            <div class="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                                <p class="text-xs text-gray-300"><strong>Demo:</strong> Use any name and password (e.g., don / password123)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         function render() {
             const app = document.getElementById('app');
             
+            if (!currentUser) {
+                app.innerHTML = renderLogin();
+                return;
+            }
+
+            // Main board view
             app.innerHTML = `
                 <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
                     <!-- Header -->
                     <header class="bg-gradient-to-r from-blue-900 via-slate-800 to-slate-900 border-b border-blue-500/20 sticky top-0 z-50 shadow-xl">
                         <div class="w-full px-4 py-3">
                             <div class="flex items-center justify-between">
-                                <div>
-                                    <h1 class="text-2xl font-bold text-white">🌳 Gumtree MVP Board</h1>
-                                    <p class="text-blue-200 text-xs mt-1">${features.length} features • ${syncStatus === 'synced' ? '🔄 Real-time sync' : syncStatus === 'error' ? '⚠️ Sync error' : '📍 Local only'}</p>
+                                <div class="flex items-center gap-3">
+                                    <div class="gumtree-logo text-lg">
+                                        <span class="text-white">gumtree</span><span class="gumtree-green">.</span><span class="text-white">co.</span><span class="gumtree-green">za</span>
+                                    </div>
+                                    <div class="border-l border-gray-600 pl-3">
+                                        <p class="text-blue-200 text-xs">MVP Board</p>
+                                        <p class="text-gray-400 text-xs">User: ${currentUser.name}</p>
+                                    </div>
                                 </div>
-                                <div class="text-right text-xs text-gray-400">
-                                    ${syncStatus === 'synced' ? '<span class="text-green-400">✅ Firebase Connected</span>' : syncStatus === 'error' ? '<span class="text-red-400">❌ Offline</span>' : '<span class="text-yellow-400">💾 localStorage</span>'}
+                                <div class="text-right">
+                                    <button onclick="handleLogout()" class="bg-red-600/30 hover:bg-red-600/50 text-red-300 text-xs px-3 py-1.5 rounded font-semibold transition">Logout</button>
                                 </div>
                             </div>
                         </div>
@@ -249,7 +300,7 @@
                 category: cat, 
                 column_name: col 
             });
-            saveToDatabase();
+            saveFeatures();
             document.getElementById('title').value = '';
             document.getElementById('desc').value = '';
             render();
@@ -265,7 +316,7 @@
             const desc = document.getElementById(`edit-desc-${id}`).value;
             features = features.map(f => f.id === id ? { ...f, title, description: desc } : f);
             editingId = null;
-            saveToDatabase();
+            saveFeatures();
             render();
         }
 
@@ -277,22 +328,23 @@
         function deleteFeature(id) {
             if (confirm('Delete this feature?')) {
                 features = features.filter(f => f.id !== id);
-                saveToDatabase();
+                saveFeatures();
                 render();
             }
         }
 
         function moveFeature(id, col) {
             features = features.map(f => f.id === id ? { ...f, column_name: col } : f);
-            saveToDatabase();
+            saveFeatures();
             render();
         }
 
-        // Setup Firebase listener
-        setupFirebaseListener();
-
-        // Initial render
-        render();
+        // Check if logged in
+        if (checkLogin()) {
+            render();
+        } else {
+            render();
+        }
     </script>
 </body>
 </html>
