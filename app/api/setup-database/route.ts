@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { Pool } from 'pg';
 
-const SUPABASE_URL = 'https://hqfszlxdkvwlvpwqqmbd.supabase.co';
-const SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxZnN6bHhka3Z3bHZwd3FxbWJkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjU1MTE4OCwiImV4cCI6MjA4ODEyNzE4OH0.EAOsrTO51SrDiyRz5DHp0uGYSpUSans-uNlqZcABPyk';
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+const pool = new Pool({
+  host: 'db.hqfszlxdkvwlvpwqqmbd.supabase.co',
+  port: 5432,
+  database: 'postgres',
+  user: 'postgres',
+  password: 'QWA@.Fa2%eh8Kb-',
+  ssl: { rejectUnauthorized: false } as any,
+});
 
 const MVP_FEATURES = [
   { id: 'mvp-1', title: 'Post Listing with Photos', description: 'Title, description, price, category, location, up to 6 photos, condition selector', category: 'listings', person: 'don', column_name: 'mvp', timestamp: Date.now() - 3600000 },
@@ -44,52 +48,59 @@ const MVP_FEATURES = [
 ];
 
 export async function POST(request: NextRequest) {
+  const client = await pool.connect();
   try {
-    console.log('🌱 Creating features table via Supabase...');
+    console.log('🌱 Creating features table via PostgreSQL...');
 
-    // Check if table already exists
-    const { data: existing } = await supabase
-      .from('features')
-      .select('id')
-      .limit(1);
+    // Create table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS public.features (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        description TEXT,
+        category TEXT NOT NULL,
+        person TEXT NOT NULL,
+        column_name TEXT NOT NULL,
+        timestamp BIGINT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      
+      CREATE INDEX IF NOT EXISTS features_person_idx ON public.features(person);
+      CREATE INDEX IF NOT EXISTS features_column_idx ON public.features(column_name);
+      CREATE INDEX IF NOT EXISTS features_category_idx ON public.features(category);
+    `);
+    console.log('✅ Table created!');
 
-    if (existing !== null) {
-      console.log('Table already exists, skipping creation');
-      return NextResponse.json({ status: 'table_exists' });
+    console.log('📦 Inserting 34 MVP features...');
+    const now = Date.now() - 3600000;
+    
+    for (const feature of MVP_FEATURES) {
+      await client.query(
+        `INSERT INTO public.features 
+         (id, title, description, category, person, column_name, timestamp) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         ON CONFLICT (id) DO NOTHING`,
+        [feature.id, feature.title, feature.description, feature.category, feature.person, feature.column_name, now]
+      );
     }
-  } catch (e) {
-    // Table doesn't exist, continue with creation
-  }
-
-  try {
-    // Insert features - Supabase will auto-create the table on first insert
-    const { data, error } = await supabase
-      .from('features')
-      .insert(MVP_FEATURES)
-      .select();
-
-    if (error) {
-      console.error('Insert error:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    console.log(`✅ Inserted ${data?.length || 0} features`);
+    console.log('✅ All 34 features inserted!');
 
     // Verify count
-    const { count } = await supabase
-      .from('features')
-      .select('*', { count: 'exact' });
+    const result = await client.query('SELECT COUNT(*) as count FROM public.features');
+    const count = result.rows[0].count;
 
     return NextResponse.json({
       status: 'success',
-      message: `Seeded ${count} MVP features to Supabase`,
+      message: `Successfully seeded ${count} MVP features to Supabase`,
       count,
     });
   } catch (error: any) {
     console.error('Fatal error:', error);
     return NextResponse.json(
-      { error: error.message },
+      { error: error.message || 'Database setup failed' },
       { status: 500 }
     );
+  } finally {
+    client.release();
   }
 }
