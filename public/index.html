@@ -12,18 +12,40 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .card-hover { transition: all 0.2s ease; }
         .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
     <div id="app" class="min-h-screen"></div>
     
     <script>
-        // Firebase Config - Using localStorage fallback if Firebase unavailable
+        // ============================================================================
+        // FIREBASE CONFIG - Update with your project credentials
+        // Get from: https://console.firebase.google.com
+        // ============================================================================
         const firebaseConfig = {
-            apiKey: "AIzaSyDemoKey",
-            projectId: "gumtree-mvp-board",
-            databaseURL: "https://gumtree-mvp-board.firebaseio.com"
+            apiKey: localStorage.getItem('firebase_apiKey') || "",
+            projectId: localStorage.getItem('firebase_projectId') || "gumtree-mvp",
+            databaseURL: localStorage.getItem('firebase_databaseURL') || "https://gumtree-mvp.firebaseio.com"
         };
+
+        let db = null;
+        let firebaseReady = false;
+
+        // Initialize Firebase
+        if (firebaseConfig.apiKey && firebaseConfig.projectId) {
+            try {
+                const app = firebase.initializeApp(firebaseConfig);
+                db = firebase.database(app);
+                firebaseReady = true;
+                console.log('✅ Firebase connected');
+            } catch (e) {
+                console.log('⚠️ Firebase unavailable, using localStorage');
+            }
+        } else {
+            console.log('ℹ️ Firebase not configured, using localStorage');
+        }
 
         const CATEGORIES = {
             listings: { icon: '📦', label: 'Listings & Browsing' },
@@ -78,6 +100,41 @@
 
         let features = JSON.parse(localStorage.getItem('gumtree_features')) || DEFAULT_FEATURES;
         let editingId = null;
+        let syncStatus = firebaseReady ? 'synced' : 'offline';
+
+        // Setup Firebase real-time listener
+        function setupFirebaseListener() {
+            if (!db) return;
+            
+            db.ref('features').on('value', (snapshot) => {
+                if (snapshot.val()) {
+                    const fbFeatures = Object.values(snapshot.val());
+                    features = fbFeatures;
+                    localStorage.setItem('gumtree_features', JSON.stringify(features));
+                    syncStatus = 'synced';
+                    render();
+                }
+            }, (error) => {
+                console.error('Firebase sync error:', error);
+                syncStatus = 'error';
+            });
+        }
+
+        function saveToDatabase() {
+            // Save to localStorage always
+            localStorage.setItem('gumtree_features', JSON.stringify(features));
+            
+            // Also sync to Firebase if available
+            if (db) {
+                const fbData = {};
+                features.forEach((f, i) => {
+                    fbData[f.id] = f;
+                });
+                db.ref('features').set(fbData).catch(e => {
+                    console.error('Firebase write error:', e);
+                });
+            }
+        }
 
         function render() {
             const app = document.getElementById('app');
@@ -90,10 +147,10 @@
                             <div class="flex items-center justify-between">
                                 <div>
                                     <h1 class="text-2xl font-bold text-white">🌳 Gumtree MVP Board</h1>
-                                    <p class="text-blue-200 text-xs mt-1">${features.length} features • Real-time collaboration</p>
+                                    <p class="text-blue-200 text-xs mt-1">${features.length} features • ${syncStatus === 'synced' ? '🔄 Real-time sync' : syncStatus === 'error' ? '⚠️ Sync error' : '📍 Local only'}</p>
                                 </div>
                                 <div class="text-right text-xs text-gray-400">
-                                    📍 Data persists locally
+                                    ${syncStatus === 'synced' ? '<span class="text-green-400">✅ Firebase Connected</span>' : syncStatus === 'error' ? '<span class="text-red-400">❌ Offline</span>' : '<span class="text-yellow-400">💾 localStorage</span>'}
                                 </div>
                             </div>
                         </div>
@@ -141,7 +198,7 @@
                                     
                                     <div class="flex-1 p-4 space-y-3 overflow-y-auto">
                                         ${features.filter(f => f.column_name === col).length === 0 ? `
-                                            <p class="text-gray-500 text-sm text-center py-8">No features yet</p>
+                                            <p class="text-gray-500 text-xs text-center py-8">No features yet</p>
                                         ` : features.filter(f => f.column_name === col).map(f => `
                                             <div class="fade-in card-hover bg-slate-700/50 border border-slate-600/50 rounded-lg p-3 text-white group flex flex-col">
                                                 ${editingId === f.id ? `
@@ -178,11 +235,6 @@
             `;
         }
 
-        function save() {
-            localStorage.setItem('gumtree_features', JSON.stringify(features));
-            render();
-        }
-
         function addFeature(e) {
             e.preventDefault();
             const title = document.getElementById('title').value;
@@ -197,9 +249,10 @@
                 category: cat, 
                 column_name: col 
             });
-            save();
+            saveToDatabase();
             document.getElementById('title').value = '';
             document.getElementById('desc').value = '';
+            render();
         }
 
         function editFeature(id) {
@@ -212,7 +265,8 @@
             const desc = document.getElementById(`edit-desc-${id}`).value;
             features = features.map(f => f.id === id ? { ...f, title, description: desc } : f);
             editingId = null;
-            save();
+            saveToDatabase();
+            render();
         }
 
         function cancelEdit() {
@@ -223,14 +277,19 @@
         function deleteFeature(id) {
             if (confirm('Delete this feature?')) {
                 features = features.filter(f => f.id !== id);
-                save();
+                saveToDatabase();
+                render();
             }
         }
 
         function moveFeature(id, col) {
             features = features.map(f => f.id === id ? { ...f, column_name: col } : f);
-            save();
+            saveToDatabase();
+            render();
         }
+
+        // Setup Firebase listener
+        setupFirebaseListener();
 
         // Initial render
         render();
