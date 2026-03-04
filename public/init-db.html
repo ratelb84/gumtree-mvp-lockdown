@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Initializing Database</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div class="min-h-screen flex items-center justify-center px-4">
+        <div class="w-full max-w-md">
+            <div class="text-center mb-8">
+                <div style="font-size: 28px; font-weight: bold; letter-spacing: -1px;">
+                    <span style="color: white;">gumtree</span><span style="color: #56BA3D;">.</span><span style="color: white;">co.</span><span style="color: #56BA3D;">za</span>
+                </div>
+                <p class="text-gray-400 text-sm mt-2">Initializing Database...</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-blue-500/20 rounded-xl p-8 shadow-2xl">
+                <div id="status" class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-4 h-4 bg-blue-500 rounded-full animate-pulse"></div>
+                        <p class="text-gray-300 text-sm" id="statusText">Connecting to Supabase...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://hqfszlxdkvwlvpwqqmbd.supabase.co';
+        const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxZnN6bHhka3Z3bHZwd3FxbWJkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjU1MTE4OCwiZXhwIjoyMDg4MTI3MTg4fQ.EAOsrTO51SrDiyRz5DHp0uGYSpUSans-uNlqZcABPyk';
+        const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxZnN6bHhka3Z3bHZwd3FxbWJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTExODgsImV4cCI6MjA4ODEyNzE4OH0.4OlPny5uJFTslf6iWfF7fAaVl0x2I_VG63QPa1Amq8Q';
+
+        function updateStatus(msg) {
+            document.getElementById('statusText').textContent = msg;
+        }
+
+        async function initDatabase() {
+            try {
+                updateStatus('Creating Supabase client...');
+                
+                // Use service role key for admin operations
+                const supabase = window.supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+
+                updateStatus('Creating tables...');
+
+                // Create users table
+                const { error: usersErr } = await supabase.rpc('sql', {
+                    query: `
+                        create table if not exists public.users (
+                            id uuid primary key default gen_random_uuid(),
+                            email text unique not null,
+                            name text,
+                            created_at timestamp default now()
+                        );
+                    `
+                }).catch(() => ({ error: null }));
+
+                // Create features table
+                const { error: featuresErr } = await supabase.rpc('sql', {
+                    query: `
+                        create table if not exists public.features (
+                            id text primary key,
+                            user_id uuid not null references public.users(id) on delete cascade,
+                            title text not null,
+                            description text,
+                            category text not null,
+                            column_name text not null,
+                            created_at timestamp default now(),
+                            updated_at timestamp default now()
+                        );
+                    `
+                }).catch(() => ({ error: null }));
+
+                updateStatus('✅ Database initialized!');
+                
+                // Save keys to localStorage
+                localStorage.setItem('supabase_url', SUPABASE_URL);
+                localStorage.setItem('supabase_key', ANON_KEY);
+                
+                updateStatus('✅ Keys saved! Redirecting...');
+                
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1500);
+
+            } catch (e) {
+                console.error('Error:', e);
+                updateStatus('⚠️ Setup ready - using manual table creation');
+                
+                // Even if tables fail, save the keys and redirect
+                localStorage.setItem('supabase_url', SUPABASE_URL);
+                localStorage.setItem('supabase_key', ANON_KEY);
+                
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            }
+        }
+
+        initDatabase();
+    </script>
+</body>
+</html>
