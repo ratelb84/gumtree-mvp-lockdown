@@ -113,32 +113,38 @@ export default function MVPLockdownPage() {
   const [editDesc, setEditDesc] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // Load features from Supabase and poll for updates
-  useEffect(() => {
-    loadFeatures()
-    
-    // Poll for changes every 2 seconds for real-time feel
-    const interval = setInterval(() => {
-      loadFeatures()
-    }, 2000)
-    
-    return () => clearInterval(interval)
-  }, [])
-
-  // Load saved credentials
+  // Load saved credentials and auto-login if available
   useEffect(() => {
     const savedCreds = localStorage.getItem('gumtree_mvp_creds')
-    if (savedCreds) {
+    const savedPerson = localStorage.getItem('gumtree_mvp_person')
+    
+    if (savedCreds && savedPerson) {
       try {
         const creds = JSON.parse(savedCreds)
         setUsername(creds.username)
         setPassword(creds.password)
         setRememberMe(true)
+        setCurrentPerson(savedPerson as Person)
+        setStage('board')
+        loadFeatures()
       } catch (e) {
         // Ignore
       }
+    } else {
+      loadFeatures()
     }
   }, [])
+
+  // Poll for changes when on board
+  useEffect(() => {
+    if (stage !== 'board') return
+    
+    const interval = setInterval(() => {
+      loadFeatures()
+    }, 2000)
+    
+    return () => clearInterval(interval)
+  }, [stage])
 
   function loadFeatures() {
     setLoading(true)
@@ -164,14 +170,19 @@ export default function MVPLockdownPage() {
       return
     }
     
+    const person = user[0] as Person
+    
     if (rememberMe) {
       localStorage.setItem('gumtree_mvp_creds', JSON.stringify({ username, password }))
+      localStorage.setItem('gumtree_mvp_person', person)
     } else {
       localStorage.removeItem('gumtree_mvp_creds')
+      localStorage.removeItem('gumtree_mvp_person')
     }
     
-    setCurrentPerson(user[0] as Person)
+    setCurrentPerson(person)
     setStage('board')
+    loadFeatures()
   }
 
   const handleAddFeature = () => {
@@ -223,6 +234,15 @@ export default function MVPLockdownPage() {
     setFeatures(updated)
     setEditingId(null)
     setLoading(false)
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('gumtree_mvp_person')
+    localStorage.removeItem('gumtree_mvp_creds')
+    setCurrentPerson(null)
+    setStage('login')
+    setUsername('')
+    setPassword('')
   }
 
   const handleCancelEdit = () => {
