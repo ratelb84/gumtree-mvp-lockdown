@@ -94,17 +94,38 @@
             try {
                 let result;
                 if (isSignup) {
-                    result = await supabaseClient.auth.signUp({ email, password });
+                    result = await supabaseClient.auth.signUp({ 
+                        email, 
+                        password,
+                        options: {
+                            emailRedirectTo: window.location.origin
+                        }
+                    });
+                    
+                    if (result.error) {
+                        alert('Signup error: ' + result.error.message);
+                        return;
+                    }
+                    
+                    // Auto-login after signup
+                    alert('Account created! Logging in...');
+                    const loginResult = await supabaseClient.auth.signInWithPassword({ email, password });
+                    if (loginResult.error) {
+                        alert('Please refresh and login manually: ' + loginResult.error.message);
+                        return;
+                    }
+                    user = loginResult.data.user;
                 } else {
                     result = await supabaseClient.auth.signInWithPassword({ email, password });
+                    
+                    if (result.error) {
+                        alert('Login error: ' + result.error.message);
+                        return;
+                    }
+                    
+                    user = result.data.user;
                 }
 
-                if (result.error) {
-                    alert('Error: ' + result.error.message);
-                    return;
-                }
-
-                user = result.data.user;
                 await loadFeatures();
                 showBoard();
             } catch(err) {
