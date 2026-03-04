@@ -560,10 +560,15 @@ localStorage.setItem('supabase_key', 'YOUR_ANON_KEY');
             render();
         }
 
-        // Initialize
-        setTimeout(() => {
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
             checkAuth();
-        }, 100);
+        });
+
+        // Fallback if DOMContentLoaded already fired
+        if (document.readyState !== 'loading') {
+            checkAuth();
+        }
     </script>
 </body>
 </html>
