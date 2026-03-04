@@ -6,71 +6,72 @@
     <title>Gumtree MVP Board</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
-    <div id="app"></div>
+<body class="text-white min-h-screen">
+    <!-- INITIAL CONTENT - SHOWS IMMEDIATELY -->
+    <div id="app" class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-sm">
+            <div class="text-center mb-8">
+                <div class="text-4xl font-bold mb-2">
+                    <span style="color:white">gumtree</span><span style="color:#56BA3D">.</span><span style="color:white">co.</span><span style="color:#56BA3D">za</span>
+                </div>
+                <p class="text-gray-400">MVP Feature Board</p>
+            </div>
+
+            <div class="bg-slate-800 border border-blue-500 border-opacity-20 rounded-xl p-8">
+                <h2 class="text-2xl font-bold mb-6">Login</h2>
+                
+                <form onsubmit="handleAuth(event)" class="space-y-4">
+                    <input type="email" id="email" placeholder="Email" class="w-full bg-slate-700 border border-slate-600 text-white px-4 py-2 rounded-lg focus:outline-none focus:border-blue-500" required />
+                    <input type="password" id="password" placeholder="Password" class="w-full bg-slate-700 border border-slate-600 text-white px-4 py-2 rounded-lg focus:outline-none focus:border-blue-500" required />
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition">Login</button>
+                </form>
+
+                <button onclick="toggleMode()" class="w-full text-blue-400 text-sm mt-4 hover:text-blue-300">
+                    <span id="toggleText">No account? Sign Up</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // SIMPLE AND DIRECT - NO ASYNC WAIT
-        const SUPABASE_URL = 'https://hqfszlxdkvwlvpwqqmbd.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxZnN6bHhka3Z3bHZwd3FxbWJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTExODgsImV4cCI6MjA4ODEyNzE4OH0.4OlPny5uJFTslf6iWfF7fAaVl0x2I_VG63QPa1Amq8Q';
-
-        let supabase;
+        let isSignup = false;
+        let supabase = null;
         let user = null;
         let features = [];
 
-        // Initialize Supabase immediately
+        // Initialize Supabase
         try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            supabase = window.supabase.createClient(
+                'https://hqfszlxdkvwlvpwqqmbd.supabase.co',
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxZnN6bHhka3Z3bHZwd3FxbWJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTExODgsImV4cCI6MjA4ODEyNzE4OH0.4OlPny5uJFTslf6iWfF7fAaVl0x2I_VG63QPa1Amq8Q'
+            );
         } catch(e) {
-            console.error('Supabase init error:', e);
+            console.error('Supabase error:', e);
+            alert('Failed to initialize');
         }
 
-        // Show login immediately
-        function showLogin() {
-            document.getElementById('app').innerHTML = `
-                <div class="min-h-screen flex items-center justify-center p-4">
-                    <div class="w-full max-w-sm">
-                        <div class="text-center mb-8">
-                            <div class="text-4xl font-bold mb-2">
-                                <span>gumtree</span><span style="color:#56BA3D;">.</span><span>co.</span><span style="color:#56BA3D;">za</span>
-                            </div>
-                            <p class="text-gray-400">MVP Feature Board</p>
-                        </div>
-
-                        <div class="bg-slate-800 border border-blue-500/20 rounded-xl p-8">
-                            <h2 class="text-2xl font-bold mb-6" id="authTitle">Login</h2>
-                            
-                            <form id="authForm" class="space-y-4">
-                                <input type="email" id="email" placeholder="Email" class="w-full bg-slate-700 border border-slate-600 text-white px-4 py-2 rounded-lg" required/>
-                                <input type="password" id="password" placeholder="Password" class="w-full bg-slate-700 border border-slate-600 text-white px-4 py-2 rounded-lg" required/>
-                                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold">Login</button>
-                            </form>
-
-                            <button onclick="toggleMode()" class="w-full text-blue-400 text-sm mt-4 hover:text-blue-300">
-                                <span id="toggleText">No account? Sign Up</span>
-                            </button>
-
-                            <div class="mt-6 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-                                <p class="text-xs text-yellow-400"><strong>Demo:</strong> Use any email and password</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            const form = document.getElementById('authForm');
-            form.onsubmit = handleAuth;
-        }
-
-        let isSignup = false;
-        function toggleMode() {
+        window.toggleMode = function() {
             isSignup = !isSignup;
-            document.getElementById('authTitle').textContent = isSignup ? 'Sign Up' : 'Login';
-            document.getElementById('toggleText').textContent = isSignup ? 'Have account? Login' : 'No account? Sign Up';
-        }
+            const title = document.querySelector('h2');
+            const btn = document.querySelector('button[type="submit"]');
+            const toggle = document.getElementById('toggleText');
+            
+            if (isSignup) {
+                title.textContent = 'Sign Up';
+                btn.textContent = 'Sign Up';
+                toggle.textContent = 'Have account? Login';
+            } else {
+                title.textContent = 'Login';
+                btn.textContent = 'Login';
+                toggle.textContent = 'No account? Sign Up';
+            }
+        };
 
-        async function handleAuth(e) {
+        window.handleAuth = async function(e) {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
@@ -83,32 +84,51 @@
                     result = await supabase.auth.signInWithPassword({ email, password });
                 }
 
-                if (result.error) throw result.error;
-                
+                if (result.error) {
+                    alert('Error: ' + result.error.message);
+                    return;
+                }
+
                 user = result.data.user;
-                features = [];
+                await loadFeatures();
                 showBoard();
+            } catch(err) {
+                alert('Error: ' + err.message);
+            }
+        };
+
+        async function loadFeatures() {
+            if (!user) return;
+            try {
+                const { data, error } = await supabase
+                    .from('features')
+                    .select('*')
+                    .eq('user_id', user.id);
+                
+                if (!error) {
+                    features = data || [];
+                }
             } catch(e) {
-                alert('Error: ' + e.message);
+                console.error('Load error:', e);
             }
         }
 
         function showBoard() {
-            document.getElementById('app').innerHTML = `
+            const html = `
                 <div class="min-h-screen">
-                    <header class="bg-gradient-to-r from-blue-900 to-slate-900 border-b border-blue-500/20 sticky top-0 p-4 flex justify-between items-center">
+                    <header class="bg-gradient-to-r from-blue-900 to-slate-900 border-b border-blue-500 border-opacity-20 p-4 flex justify-between items-center sticky top-0">
                         <div class="text-xl font-bold">
-                            <span>gumtree</span><span style="color:#56BA3D;">.</span><span>co.</span><span style="color:#56BA3D;">za</span>
+                            <span>gumtree</span><span style="color:#56BA3D">.</span><span>co.</span><span style="color:#56BA3D">za</span>
                         </div>
-                        <button onclick="handleLogout()" class="bg-red-600/30 hover:bg-red-600/50 text-red-300 text-xs px-3 py-1.5 rounded">Logout</button>
+                        <button onclick="handleLogout()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-2 rounded">Logout</button>
                     </header>
 
                     <main class="p-6 max-w-7xl mx-auto">
-                        <div class="mb-6 bg-slate-800 border border-blue-500/20 rounded-xl p-4">
+                        <div class="mb-6 bg-slate-800 border border-blue-500 border-opacity-20 rounded-xl p-4">
                             <h2 class="text-white font-bold mb-3">➕ Add Feature</h2>
-                            <form id="addForm" class="space-y-3">
-                                <input type="text" id="title" placeholder="Title" class="w-full bg-slate-700 border border-slate-600 text-white px-4 py-2 rounded-lg text-sm" required/>
-                                <textarea id="desc" placeholder="Description" class="w-full bg-slate-700 border border-slate-600 text-white px-4 py-2 rounded-lg text-sm" rows="2"></textarea>
+                            <form onsubmit="addFeature(event)" class="space-y-3">
+                                <input type="text" id="title" placeholder="Title" class="w-full bg-slate-700 border border-slate-600 text-white px-4 py-2 rounded-lg text-sm focus:outline-none" required />
+                                <textarea id="desc" placeholder="Description" class="w-full bg-slate-700 border border-slate-600 text-white px-4 py-2 rounded-lg text-sm focus:outline-none" rows="2"></textarea>
                                 <div class="grid grid-cols-3 gap-3">
                                     <select id="category" class="bg-slate-700 border border-slate-600 text-white px-4 py-2 rounded-lg text-sm">
                                         <option value="listings">📦 Listings</option>
@@ -117,7 +137,7 @@
                                         <option value="checkout">🛒 Checkout</option>
                                         <option value="delivery">🚚 Delivery</option>
                                         <option value="messaging">💬 Messaging</option>
-                                        <option value="seller-tools">💰 Seller Tools</option>
+                                        <option value="seller-tools">💰 Seller</option>
                                         <option value="buyer-protection">🛡️ Protection</option>
                                         <option value="infrastructure">🏗️ Infrastructure</option>
                                         <option value="subscription">💳 Subscription</option>
@@ -138,12 +158,12 @@
                     </main>
                 </div>
             `;
-
-            document.getElementById('addForm').onsubmit = addFeature;
+            
+            document.getElementById('app').innerHTML = html;
             renderBoard();
         }
 
-        async function addFeature(e) {
+        window.addFeature = async function(e) {
             e.preventDefault();
             const title = document.getElementById('title').value;
             const desc = document.getElementById('desc').value;
@@ -170,49 +190,9 @@
             } catch(e) {
                 alert('Error: ' + e.message);
             }
-        }
+        };
 
-        async function loadFeatures() {
-            try {
-                const { data, error } = await supabase
-                    .from('features')
-                    .select('*')
-                    .eq('user_id', user.id);
-                
-                if (error) throw error;
-                features = data || [];
-            } catch(e) {
-                console.error('Load error:', e);
-            }
-        }
-
-        function renderBoard() {
-            const board = document.getElementById('board');
-            if (!board) return;
-
-            const columns = ['mvp', 'v1.1', 'v2', 'backburner'];
-            const labels = { mvp: '🔴 MVP', 'v1.1': '🟡 V1.1', v2: '🟢 V2', backburner: '⚫ Backburner' };
-
-            board.innerHTML = columns.map(col => `
-                <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
-                    <div class="bg-slate-700/50 px-4 py-3">
-                        <h3 class="font-bold">${labels[col]}</h3>
-                        <p class="text-xs text-gray-400">${features.filter(f => f.column_name === col).length} items</p>
-                    </div>
-                    <div class="p-3 space-y-2 max-h-96 overflow-y-auto">
-                        ${features.filter(f => f.column_name === col).map(f => `
-                            <div class="bg-slate-700/50 border border-slate-600 rounded-lg p-3 text-sm">
-                                <p class="font-bold">${f.title}</p>
-                                ${f.description ? `<p class="text-xs text-gray-300 mt-1">${f.description}</p>` : ''}
-                                <button onclick="deleteFeature('${f.id}')" class="text-xs bg-red-600/30 text-red-300 px-2 py-1 rounded mt-2">Delete</button>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        window.deleteFeature = async (id) => {
+        window.deleteFeature = async function(id) {
             if (!confirm('Delete?')) return;
             try {
                 const { error } = await supabase.from('features').delete().eq('id', id);
@@ -224,15 +204,42 @@
             }
         };
 
-        window.handleLogout = async () => {
+        window.handleLogout = async function() {
             await supabase.auth.signOut();
             user = null;
             features = [];
-            showLogin();
+            location.reload();
         };
 
-        // Start
-        showLogin();
+        function renderBoard() {
+            const board = document.getElementById('board');
+            if (!board) return;
+
+            const cols = [
+                { id: 'mvp', label: '🔴 MVP' },
+                { id: 'v1.1', label: '🟡 V1.1' },
+                { id: 'v2', label: '🟢 V2' },
+                { id: 'backburner', label: '⚫ Backburner' }
+            ];
+
+            board.innerHTML = cols.map(col => `
+                <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+                    <div class="bg-slate-700 px-4 py-3">
+                        <h3 class="font-bold text-white">${col.label}</h3>
+                        <p class="text-xs text-gray-400">${features.filter(f => f.column_name === col.id).length} items</p>
+                    </div>
+                    <div class="p-3 space-y-2 max-h-96 overflow-y-auto">
+                        ${features.filter(f => f.column_name === col.id).map(f => `
+                            <div class="bg-slate-700 border border-slate-600 rounded-lg p-3 text-sm">
+                                <p class="font-bold text-white">${f.title}</p>
+                                ${f.description ? `<p class="text-xs text-gray-400 mt-1">${f.description}</p>` : ''}
+                                <button onclick="deleteFeature('${f.id}')" class="text-xs bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded mt-2">Delete</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
     </script>
 </body>
 </html>
