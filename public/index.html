@@ -5,70 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gumtree MVP Board</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); }
     </style>
 </head>
 <body class="text-white min-h-screen">
-    <!-- INITIAL CONTENT - SHOWS IMMEDIATELY -->
-    <div id="app" class="min-h-screen flex items-center justify-center p-4">
-        <div class="w-full max-w-sm">
-            <div class="text-center mb-8">
-                <div class="text-4xl font-bold mb-2">
-                    <span style="color:white">gumtree</span><span style="color:#56BA3D">.</span><span style="color:white">co.</span><span style="color:#56BA3D">za</span>
-                </div>
-                <p class="text-gray-400">MVP Feature Board</p>
-            </div>
-
-            <div class="bg-slate-800 border border-blue-500 border-opacity-20 rounded-xl p-8">
-                <h2 class="text-2xl font-bold mb-6">Login</h2>
-                
-                <form onsubmit="handleAuth(event)" class="space-y-4">
-                    <input type="email" id="email" placeholder="Email" class="w-full bg-slate-700 border border-slate-600 text-white px-4 py-2 rounded-lg focus:outline-none focus:border-blue-500" required />
-                    <input type="password" id="password" placeholder="Password" class="w-full bg-slate-700 border border-slate-600 text-white px-4 py-2 rounded-lg focus:outline-none focus:border-blue-500" required />
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition">Login</button>
-                </form>
-
-                <button onclick="toggleMode()" class="w-full text-blue-400 text-sm mt-4 hover:text-blue-300">
-                    <span id="toggleText">No account? Sign Up</span>
-                </button>
-            </div>
-        </div>
-    </div>
+    <div id="app"></div>
 
     <script>
-        let isSignup = false;
         let user = null;
         let features = [];
-        
-        // Wait for Supabase to load, then initialize
-        let supabaseClient = null;
-        
-        function initSupabase() {
-            if (!window.supabase) {
-                console.error('Supabase library not loaded');
-                return;
-            }
+
+        // DEMO MODE - Store users in localStorage
+        function demoLogin(email, password) {
+            let users = JSON.parse(localStorage.getItem('demo_users') || '{}');
             
-            try {
-                supabaseClient = window.supabase.createClient(
-                    'https://hqfszlxdkvwlvpwqqmbd.supabase.co',
-                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxZnN6bHhka3Z3bHZwd3FxbWJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTExODgsImV4cCI6MjA4ODEyNzE4OH0.4OlPny5uJFTslf6iWfF7fAaVl0x2I_VG63QPa1Amq8Q'
-                );
-                console.log('✅ Supabase initialized');
-            } catch(e) {
-                console.error('Supabase error:', e);
+            if (users[email]) {
+                // User exists
+                if (users[email].password !== password) {
+                    throw new Error('Invalid password');
+                }
+                return { id: email, email };
+            } else {
+                // Create new user
+                users[email] = { password, email };
+                localStorage.setItem('demo_users', JSON.stringify(users));
+                return { id: email, email };
             }
-        }
-        
-        // Initialize when ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initSupabase);
-        } else {
-            initSupabase();
         }
 
+        function showLogin() {
+            document.getElementById('app').innerHTML = `
+                <div class="min-h-screen flex items-center justify-center p-4">
+                    <div class="w-full max-w-sm">
+                        <div class="text-center mb-8">
+                            <div class="text-4xl font-bold mb-2">
+                                <span style="color:white">gumtree</span><span style="color:#56BA3D">.</span><span style="color:white">co.</span><span style="color:#56BA3D">za</span>
+                            </div>
+                            <p class="text-gray-400">MVP Feature Board</p>
+                        </div>
+
+                        <div class="bg-slate-800 border border-blue-500/20 rounded-xl p-8">
+                            <h2 class="text-2xl font-bold mb-6">Login</h2>
+                            
+                            <form onsubmit="handleAuth(event)" class="space-y-4">
+                                <input type="email" id="email" placeholder="Email (e.g. don@example.com)" class="w-full bg-slate-700 border border-slate-600 text-white px-4 py-2 rounded-lg" required />
+                                <input type="password" id="password" placeholder="Password" class="w-full bg-slate-700 border border-slate-600 text-white px-4 py-2 rounded-lg" required />
+                                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg">Login</button>
+                            </form>
+
+                            <button onclick="toggleMode()" class="w-full text-blue-400 text-sm mt-4 hover:text-blue-300">
+                                <span id="toggleText">No account? Sign Up</span>
+                            </button>
+
+                            <div class="mt-6 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-xs text-yellow-300">
+                                <strong>Demo Mode:</strong> Use any email/password. No email verification needed.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        let isSignup = false;
         window.toggleMode = function() {
             isSignup = !isSignup;
             const title = document.querySelector('h2');
@@ -86,85 +85,39 @@
             }
         };
 
-        window.handleAuth = async function(e) {
+        window.handleAuth = function(e) {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
             try {
-                let result;
-                if (isSignup) {
-                    result = await supabaseClient.auth.signUp({ 
-                        email, 
-                        password,
-                        options: {
-                            emailRedirectTo: window.location.origin
-                        }
-                    });
-                    
-                    if (result.error) {
-                        alert('Signup error: ' + result.error.message);
-                        return;
-                    }
-                    
-                    // Auto-login after signup
-                    alert('Account created! Logging in...');
-                    const loginResult = await supabaseClient.auth.signInWithPassword({ email, password });
-                    if (loginResult.error) {
-                        alert('Please refresh and login manually: ' + loginResult.error.message);
-                        return;
-                    }
-                    user = loginResult.data.user;
-                } else {
-                    result = await supabaseClient.auth.signInWithPassword({ email, password });
-                    
-                    if (result.error) {
-                        alert('Login error: ' + result.error.message);
-                        return;
-                    }
-                    
-                    user = result.data.user;
-                }
-
-                await loadFeatures();
+                user = demoLogin(email, password);
+                features = JSON.parse(localStorage.getItem(`features_${user.id}`) || '[]');
                 showBoard();
             } catch(err) {
                 alert('Error: ' + err.message);
             }
         };
 
-        async function loadFeatures() {
-            if (!user) return;
-            try {
-                const { data, error } = await supabase
-                    .from('features')
-                    .select('*')
-                    .eq('user_id', user.id);
-                
-                if (!error) {
-                    features = data || [];
-                }
-            } catch(e) {
-                console.error('Load error:', e);
-            }
-        }
-
         function showBoard() {
-            const html = `
+            document.getElementById('app').innerHTML = `
                 <div class="min-h-screen">
-                    <header class="bg-gradient-to-r from-blue-900 to-slate-900 border-b border-blue-500 border-opacity-20 p-4 flex justify-between items-center sticky top-0">
+                    <header class="bg-gradient-to-r from-blue-900 to-slate-900 border-b border-blue-500/20 p-4 flex justify-between items-center sticky top-0">
                         <div class="text-xl font-bold">
                             <span>gumtree</span><span style="color:#56BA3D">.</span><span>co.</span><span style="color:#56BA3D">za</span>
                         </div>
-                        <button onclick="handleLogout()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-2 rounded">Logout</button>
+                        <div class="flex items-center gap-4">
+                            <span class="text-sm text-gray-300">${user.email}</span>
+                            <button onclick="handleLogout()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-2 rounded">Logout</button>
+                        </div>
                     </header>
 
                     <main class="p-6 max-w-7xl mx-auto">
-                        <div class="mb-6 bg-slate-800 border border-blue-500 border-opacity-20 rounded-xl p-4">
+                        <div class="mb-6 bg-slate-800 border border-blue-500/20 rounded-xl p-4">
                             <h2 class="text-white font-bold mb-3">➕ Add Feature</h2>
                             <form onsubmit="addFeature(event)" class="space-y-3">
-                                <input type="text" id="title" placeholder="Title" class="w-full bg-slate-700 border border-slate-600 text-white px-4 py-2 rounded-lg text-sm focus:outline-none" required />
-                                <textarea id="desc" placeholder="Description" class="w-full bg-slate-700 border border-slate-600 text-white px-4 py-2 rounded-lg text-sm focus:outline-none" rows="2"></textarea>
+                                <input type="text" id="title" placeholder="Title" class="w-full bg-slate-700 border border-slate-600 text-white px-4 py-2 rounded-lg text-sm" required />
+                                <textarea id="desc" placeholder="Description" class="w-full bg-slate-700 border border-slate-600 text-white px-4 py-2 rounded-lg text-sm" rows="2"></textarea>
                                 <div class="grid grid-cols-3 gap-3">
                                     <select id="category" class="bg-slate-700 border border-slate-600 text-white px-4 py-2 rounded-lg text-sm">
                                         <option value="listings">📦 Listings</option>
@@ -194,57 +147,48 @@
                     </main>
                 </div>
             `;
-            
-            document.getElementById('app').innerHTML = html;
             renderBoard();
         }
 
-        window.addFeature = async function(e) {
+        window.addFeature = function(e) {
             e.preventDefault();
             const title = document.getElementById('title').value;
             const desc = document.getElementById('desc').value;
             const category = document.getElementById('category').value;
             const column = document.getElementById('column').value;
 
-            try {
-                const { error } = await supabaseClient.from('features').insert({
-                    id: `f-${Date.now()}`,
-                    user_id: user.id,
-                    title,
-                    description: desc,
-                    category,
-                    column_name: column
-                });
+            features.push({
+                id: `f-${Date.now()}`,
+                title,
+                description: desc,
+                category,
+                column_name: column
+            });
 
-                if (error) throw error;
-                
-                document.getElementById('title').value = '';
-                document.getElementById('desc').value = '';
-                
-                await loadFeatures();
-                renderBoard();
-            } catch(e) {
-                alert('Error: ' + e.message);
-            }
+            localStorage.setItem(`features_${user.id}`, JSON.stringify(features));
+            
+            document.getElementById('title').value = '';
+            document.getElementById('desc').value = '';
+            renderBoard();
         };
 
-        window.deleteFeature = async function(id) {
+        window.deleteFeature = function(id) {
             if (!confirm('Delete?')) return;
-            try {
-                const { error } = await supabaseClient.from('features').delete().eq('id', id);
-                if (error) throw error;
-                await loadFeatures();
-                renderBoard();
-            } catch(e) {
-                alert('Error: ' + e.message);
-            }
+            features = features.filter(f => f.id !== id);
+            localStorage.setItem(`features_${user.id}`, JSON.stringify(features));
+            renderBoard();
         };
 
-        window.handleLogout = async function() {
-            await supabaseClient.auth.signOut();
+        window.moveFeature = function(id, col) {
+            features = features.map(f => f.id === id ? { ...f, column_name: col } : f);
+            localStorage.setItem(`features_${user.id}`, JSON.stringify(features));
+            renderBoard();
+        };
+
+        window.handleLogout = function() {
             user = null;
             features = [];
-            location.reload();
+            showLogin();
         };
 
         function renderBoard() {
@@ -266,16 +210,25 @@
                     </div>
                     <div class="p-3 space-y-2 max-h-96 overflow-y-auto">
                         ${features.filter(f => f.column_name === col.id).map(f => `
-                            <div class="bg-slate-700 border border-slate-600 rounded-lg p-3 text-sm">
+                            <div class="bg-slate-700 border border-slate-600 rounded-lg p-3 text-sm group">
                                 <p class="font-bold text-white">${f.title}</p>
                                 ${f.description ? `<p class="text-xs text-gray-400 mt-1">${f.description}</p>` : ''}
-                                <button onclick="deleteFeature('${f.id}')" class="text-xs bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded mt-2">Delete</button>
+                                <p class="text-xs text-blue-300 mt-2">${f.category}</p>
+                                <div class="flex gap-1 mt-2 opacity-0 group-hover:opacity-100 transition">
+                                    ${col.id !== 'mvp' ? `<button onclick="moveFeature('${f.id}', 'mvp')" class="text-xs bg-purple-600/30 text-purple-300 px-2 py-1 rounded">MVP</button>` : ''}
+                                    ${col.id !== 'v1.1' ? `<button onclick="moveFeature('${f.id}', 'v1.1')" class="text-xs bg-purple-600/30 text-purple-300 px-2 py-1 rounded">V1.1</button>` : ''}
+                                    ${col.id !== 'v2' ? `<button onclick="moveFeature('${f.id}', 'v2')" class="text-xs bg-purple-600/30 text-purple-300 px-2 py-1 rounded">V2</button>` : ''}
+                                    <button onclick="deleteFeature('${f.id}')" class="text-xs bg-red-600/30 text-red-300 px-2 py-1 rounded">Delete</button>
+                                </div>
                             </div>
                         `).join('')}
                     </div>
                 </div>
             `).join('');
         }
+
+        // Show login on load
+        showLogin();
     </script>
 </body>
 </html>
