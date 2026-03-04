@@ -39,19 +39,34 @@
 
     <script>
         let isSignup = false;
-        let supabase = null;
         let user = null;
         let features = [];
-
-        // Initialize Supabase
-        try {
-            supabase = window.supabase.createClient(
-                'https://hqfszlxdkvwlvpwqqmbd.supabase.co',
-                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxZnN6bHhka3Z3bHZwd3FxbWJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTExODgsImV4cCI6MjA4ODEyNzE4OH0.4OlPny5uJFTslf6iWfF7fAaVl0x2I_VG63QPa1Amq8Q'
-            );
-        } catch(e) {
-            console.error('Supabase error:', e);
-            alert('Failed to initialize');
+        
+        // Wait for Supabase to load, then initialize
+        let supabaseClient = null;
+        
+        function initSupabase() {
+            if (!window.supabase) {
+                console.error('Supabase library not loaded');
+                return;
+            }
+            
+            try {
+                supabaseClient = window.supabase.createClient(
+                    'https://hqfszlxdkvwlvpwqqmbd.supabase.co',
+                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxZnN6bHhka3Z3bHZwd3FxbWJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTExODgsImV4cCI6MjA4ODEyNzE4OH0.4OlPny5uJFTslf6iWfF7fAaVl0x2I_VG63QPa1Amq8Q'
+                );
+                console.log('✅ Supabase initialized');
+            } catch(e) {
+                console.error('Supabase error:', e);
+            }
+        }
+        
+        // Initialize when ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initSupabase);
+        } else {
+            initSupabase();
         }
 
         window.toggleMode = function() {
@@ -79,9 +94,9 @@
             try {
                 let result;
                 if (isSignup) {
-                    result = await supabase.auth.signUp({ email, password });
+                    result = await supabaseClient.auth.signUp({ email, password });
                 } else {
-                    result = await supabase.auth.signInWithPassword({ email, password });
+                    result = await supabaseClient.auth.signInWithPassword({ email, password });
                 }
 
                 if (result.error) {
@@ -171,7 +186,7 @@
             const column = document.getElementById('column').value;
 
             try {
-                const { error } = await supabase.from('features').insert({
+                const { error } = await supabaseClient.from('features').insert({
                     id: `f-${Date.now()}`,
                     user_id: user.id,
                     title,
@@ -195,7 +210,7 @@
         window.deleteFeature = async function(id) {
             if (!confirm('Delete?')) return;
             try {
-                const { error } = await supabase.from('features').delete().eq('id', id);
+                const { error } = await supabaseClient.from('features').delete().eq('id', id);
                 if (error) throw error;
                 await loadFeatures();
                 renderBoard();
@@ -205,7 +220,7 @@
         };
 
         window.handleLogout = async function() {
-            await supabase.auth.signOut();
+            await supabaseClient.auth.signOut();
             user = null;
             features = [];
             location.reload();
